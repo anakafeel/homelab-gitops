@@ -1,0 +1,9 @@
+# sops reads this when encrypting: any *.sops.yaml file is encrypted for the
+# age public key below. Only the values under data/stringData are encrypted,
+# so keys, names and structure stay readable in diffs.
+# The matching private key lives at ~/.config/sops/age/keys.txt (laptop) and in
+# the cluster Secret argocd/sops-age (so Argo CD can decrypt). Never commit it.
+creation_rules:
+  - path_regex: .*\.sops\.yaml$
+    encrypted_regex: ^(data|stringData)$
+    age: age1xefqhzrwz3z9pdekd648szd94q9fl3nc025cyxlgnf6gdq5zyces6jc4zm

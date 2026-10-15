@@ -5,3 +5,5 @@ resources:
   - namespace.yaml
   - configmap.yaml
   - deployment.yaml
+generators:
+  - ksops-generator.yaml # decrypts tunnel-credentials.sops.yaml

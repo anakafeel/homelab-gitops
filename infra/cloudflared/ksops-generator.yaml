@@ -1,0 +1,13 @@
+# KSOPS generator: at render time Argo CD's repo-server runs the ksops plugin,
+# which decrypts the listed files with the age key and emits plain Secrets.
+# Only the encrypted file is in git.
+apiVersion: viaduct.ai/v1
+kind: ksops
+metadata:
+  name: cloudflared-secrets
+  annotations:
+    config.kubernetes.io/function: |
+      exec:
+        path: ksops
+files:
+  - ./tunnel-credentials.sops.yaml

@@ -14,5 +14,9 @@ spec:
     namespace: cloudflared
   syncPolicy:
     automated:
-      prune: true    # only prunes resources Argo CD created; the hand-made Secret is safe
+      prune: true
       selfHeal: true
+    syncOptions:
+      # Server-side apply doesn't write the last-applied-configuration annotation,
+      # so the decrypted Secret isn't copied into an annotation.
+      - ServerSideApply=true
