@@ -1,0 +1,22 @@
+# The only manifest applied by hand (once):
+#   kubectl apply -f bootstrap/root.yaml
+# Argo CD then reads argocd/apps/ and creates one Application per file there
+# ("app of apps"). Every later change happens through git.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/anakafeel/homelab-gitops.git
+    targetRevision: main
+    path: argocd/apps
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
