@@ -1,0 +1,54 @@
+# Argo CD Helm values for a single-node Raspberry Pi 4 (8GB).
+# Chart: argo/argo-cd 10.10.5 (Argo CD v3.5.5)
+# Install/upgrade:
+#   helm upgrade --install argocd argo/argo-cd --version 10.10.5 \
+#     -n argocd --create-namespace -f infra/argocd/values.yaml
+
+global:
+  domain: argocd.local # placeholder; real access comes via the Tailscale operator
+
+configs:
+  params:
+    # TLS ends at the ingress / Tailscale proxy, not at argocd-server.
+    server.insecure: true
+  cm:
+    # How often Argo CD re-checks git; default is 120s, fine either way on a Pi.
+    timeout.reconciliation: 180s
+
+# SSO isn't needed for one user; the local admin account is enough.
+dex:
+  enabled: false
+
+# Alerts go through Alertmanager -> ntfy in Phase 4 instead.
+notifications:
+  enabled: false
+
+# Every component runs a single replica: there is only one node.
+controller:
+  replicas: 1
+  resources:
+    requests: { cpu: 100m, memory: 256Mi }
+    limits: { memory: 768Mi }
+
+repoServer:
+  replicas: 1
+  resources:
+    requests: { cpu: 50m, memory: 128Mi }
+    limits: { memory: 512Mi }
+
+server:
+  replicas: 1
+  resources:
+    requests: { cpu: 25m, memory: 64Mi }
+    limits: { memory: 256Mi }
+
+applicationSet:
+  replicas: 1
+  resources:
+    requests: { cpu: 10m, memory: 32Mi }
+    limits: { memory: 128Mi }
+
+redis:
+  resources:
+    requests: { cpu: 10m, memory: 32Mi }
+    limits: { memory: 128Mi }
