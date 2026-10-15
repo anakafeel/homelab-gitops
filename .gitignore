@@ -1,0 +1,10 @@
+# Never commit plaintext secrets. Phase 2 adds SOPS-encrypted *.sops.yaml instead.
+*.json
+*secret*.yaml
+!*.sops.yaml
+
+# local agent tooling state (ruflo)
+.claude-flow/
+.swarm/
+agentdb.rvf*
+ruvector.db
