@@ -27,7 +27,8 @@ jobs:
       - name: Secrets are encrypted
         run: |
           fail=0
-          for f in $(git ls-files '*.sops.yaml'); do
+          # (.sops.yaml at the root is the sops config itself, not a secret)
+          for f in $(git ls-files '*.sops.yaml' | grep -v '^\.sops\.yaml$'); do
             if ! grep -q '^sops:' "$f" || ! grep -q 'ENC\[' "$f"; then
               echo "::error file=$f::not SOPS-encrypted"; fail=1
             fi
