@@ -1,5 +1,6 @@
 # Never commit plaintext secrets. Phase 2 adds SOPS-encrypted *.sops.yaml instead.
 *.json
+!renovate.json
 *secret*.yaml
 !*.sops.yaml
 
