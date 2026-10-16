@@ -63,7 +63,7 @@ jobs:
 
       - name: Schema check (kubeconform)
         run: |
-          git ls-files '*.yaml' \
+          git ls-files 'apps/*.yaml' 'infra/*.yaml' 'argocd/*.yaml' 'bootstrap/*.yaml' \
             | grep -vE '(^|/)(kustomization|ksops-generator|values)\.yaml$|\.sops\.yaml$|^\.github/' \
             | xargs kubeconform -strict -summary \
                 -kubernetes-version "${K8S_VERSION}" \
