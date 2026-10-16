@@ -1,0 +1,11 @@
+# Plain manifests for the monitoring namespace. The kube-prometheus-stack chart
+# itself is a separate Argo CD app (argocd/apps/kube-prometheus-stack.yaml) that
+# reads its values from helm/kube-prometheus-stack/values.yaml.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: monitoring
+resources:
+  - namespace.yaml
+  - grafana-ingress.yaml
+generators:
+  - ksops-generator.yaml # -> Secret grafana-admin (admin-user, admin-password)
