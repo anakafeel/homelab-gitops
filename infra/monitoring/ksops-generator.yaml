@@ -1,4 +1,4 @@
-# Decrypts the Grafana admin login at render time (Argo CD repo-server + KSOPS).
+# Decrypts the Grafana admin login and the Alertmanager Discord webhook at render time (Argo CD repo-server + KSOPS).
 apiVersion: viaduct.ai/v1
 kind: ksops
 metadata:
@@ -9,3 +9,4 @@ metadata:
         path: ksops
 files:
   - ./grafana-admin.sops.yaml
+  - ./alertmanager-discord.sops.yaml
