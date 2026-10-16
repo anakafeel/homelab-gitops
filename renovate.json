@@ -23,15 +23,6 @@
       "depNameTemplate": "argo-cd",
       "datasourceTemplate": "helm",
       "registryUrlTemplate": "https://argoproj.github.io/argo-helm"
-    },
-    {
-      "description": "KSOPS init container image in the Argo CD values file.",
-      "customType": "regex",
-      "managerFilePatterns": ["/^infra/argocd/values\\.yaml$/"],
-      "matchStrings": [
-        "image: (?<depName>viaductoss/ksops):(?<currentValue>v[\\d.]+)@(?<currentDigest>sha256:[a-f0-9]+)"
-      ],
-      "datasourceTemplate": "docker"
     }
   ],
   "packageRules": [
