@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-ingress
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2" # needs the tailscale IngressClass from the operator
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/anakafeel/homelab-gitops.git
+    targetRevision: main
+    path: infra/argocd-ingress
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

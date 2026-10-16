@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tailscale-operator
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://pkgs.tailscale.com/helmcharts
+    chart: tailscale-operator
+    targetRevision: 1.104.1
+    helm:
+      valuesObject:
+        # oauth.clientId/clientSecret left empty on purpose: the chart then
+        # mounts the pre-created Secret operator-oauth (from tailscale-oauth app).
+        operatorConfig:
+          hostname: pi-k3s-operator # device name in the tailnet admin console
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tailscale
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true # the chart's CRDs are too big for client-side apply annotations

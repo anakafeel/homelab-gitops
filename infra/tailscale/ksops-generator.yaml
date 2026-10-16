@@ -1,0 +1,11 @@
+# Decrypts the operator's OAuth client (Tailscale "trust credential") at render time.
+apiVersion: viaduct.ai/v1
+kind: ksops
+metadata:
+  name: tailscale-secrets
+  annotations:
+    config.kubernetes.io/function: |
+      exec:
+        path: ksops
+files:
+  - ./operator-oauth.sops.yaml
