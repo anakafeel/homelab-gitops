@@ -1,0 +1,18 @@
+# Probes the public site end to end from inside the cluster:
+# DNS -> Cloudflare -> tunnel -> cloudflared -> Traefik -> portfolio.
+# Produces probe_success, probe_http_status_code, probe_ssl_earliest_cert_expiry.
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: public-site
+  namespace: monitoring
+spec:
+  jobName: public-site
+  interval: 60s
+  module: http_2xx
+  prober:
+    url: blackbox-exporter.monitoring.svc:9115
+  targets:
+    staticConfig:
+      static:
+        - https://saimhashmi.xyz

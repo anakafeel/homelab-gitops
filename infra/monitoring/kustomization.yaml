@@ -7,5 +7,7 @@ namespace: monitoring
 resources:
   - namespace.yaml
   - grafana-ingress.yaml
+  - probes.yaml
+  - rules.yaml
 generators:
   - ksops-generator.yaml # -> Secrets grafana-admin, alertmanager-discord

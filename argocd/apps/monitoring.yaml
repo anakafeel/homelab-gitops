@@ -20,3 +20,6 @@ spec:
       selfHeal: true
     syncOptions:
       - ServerSideApply=true # no decrypted copy in last-applied annotation
+      # Probe/PrometheusRule CRDs come from kube-prometheus-stack (wave 1);
+      # on a fresh cluster they don't exist yet when this app first syncs.
+      - SkipDryRunOnMissingResource=true
