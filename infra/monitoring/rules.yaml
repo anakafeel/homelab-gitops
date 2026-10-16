@@ -1,0 +1,51 @@
+# Homelab-specific alerts, on top of the chart's default rules (those already
+# cover pod crash loops, failed deployments, OOM kills, etc.).
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: homelab
+  namespace: monitoring
+spec:
+  groups:
+    - name: site
+      rules:
+        - alert: SiteDown
+          expr: probe_success{job="public-site"} == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "{{ $labels.instance }} is down"
+            description: "The blackbox probe has failed for 2 minutes. Check probe_http_status_code, the cloudflared pods and the portfolio deployment."
+        - alert: TLSCertExpiringSoon
+          expr: (probe_ssl_earliest_cert_expiry{job="public-site"} - time()) / 86400 < 14
+          for: 1h
+          labels:
+            severity: warning
+          annotations:
+            summary: "TLS cert for {{ $labels.instance }} expires in {{ $value | humanize }} days"
+            description: "Edge certs are managed by Cloudflare; if this fires, check the Cloudflare SSL/TLS dashboard."
+    - name: disks
+      rules:
+        # / = SD card, /mnt/docker-root = USB disk (k3s + Docker data),
+        # /mnt/vaultpi-hdd = photo HDD, /mnt/immich-postgres = Immich DB image.
+        - alert: DiskSpaceHigh
+          expr: |
+            100 * (1 - node_filesystem_avail_bytes{mountpoint=~"/|/mnt/docker-root|/mnt/vaultpi-hdd|/mnt/immich-postgres"}
+                     / node_filesystem_size_bytes) > 85
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "{{ $labels.mountpoint }} is {{ $value | humanize }}% full"
+            description: "Above 85% on {{ $labels.device }}."
+        - alert: DiskSpaceCritical
+          expr: |
+            100 * (1 - node_filesystem_avail_bytes{mountpoint=~"/|/mnt/docker-root|/mnt/vaultpi-hdd|/mnt/immich-postgres"}
+                     / node_filesystem_size_bytes) > 95
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "{{ $labels.mountpoint }} is {{ $value | humanize }}% full"
+            description: "Above 95% on {{ $labels.device }}. Services writing here will start failing."
