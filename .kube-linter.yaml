@@ -1,0 +1,7 @@
+# kube-linter config: https://docs.kubelinter.io
+checks:
+  addAllBuiltIn: false # start from the default check set
+  exclude:
+    # Single-node cluster: there is no second node to spread replicas onto.
+    # Re-enable when a second node joins (Phase 5 libvirt VMs).
+    - no-anti-affinity
