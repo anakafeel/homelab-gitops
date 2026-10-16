@@ -1,0 +1,45 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Renovate opens update PRs only. Nothing automerges: every update is merged by hand after the validate check passes.",
+  "extends": ["config:recommended", ":dependencyDashboard"],
+  "automerge": false,
+  "prConcurrentLimit": 5,
+  "labels": ["dependencies"],
+  "argocd": {
+    "managerFilePatterns": ["/^argocd/.+\\.yaml$/", "/^bootstrap/.+\\.yaml$/"]
+  },
+  "kubernetes": {
+    "managerFilePatterns": ["/^apps/.+\\.yaml$/", "/^infra/.+\\.yaml$/"]
+  },
+  "customManagers": [
+    {
+      "description": "Argo CD Helm chart version. It is installed by hand with helm, so merging this PR does not deploy it: run the helm upgrade in infra/argocd/values.yaml afterwards.",
+      "customType": "regex",
+      "managerFilePatterns": ["/^infra/argocd/values\\.yaml$/"],
+      "matchStrings": [
+        "argo/argo-cd (?<currentValue>\\d+\\.\\d+\\.\\d+)",
+        "--version (?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "depNameTemplate": "argo-cd",
+      "datasourceTemplate": "helm",
+      "registryUrlTemplate": "https://argoproj.github.io/argo-helm"
+    },
+    {
+      "description": "KSOPS init container image in the Argo CD values file.",
+      "customType": "regex",
+      "managerFilePatterns": ["/^infra/argocd/values\\.yaml$/"],
+      "matchStrings": [
+        "image: (?<depName>viaductoss/ksops):(?<currentValue>v[\\d.]+)@(?<currentDigest>sha256:[a-f0-9]+)"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Portfolio deploys stay deliberate: a digest-bump PR is the only deploy path, never merged automatically.",
+      "matchPackageNames": ["docker.io/anakafeel/nextjs-portfolio", "anakafeel/nextjs-portfolio"],
+      "automerge": false,
+      "commitMessageTopic": "portfolio image"
+    }
+  ]
+}
