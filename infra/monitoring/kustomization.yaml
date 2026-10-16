@@ -8,4 +8,4 @@ resources:
   - namespace.yaml
   - grafana-ingress.yaml
 generators:
-  - ksops-generator.yaml # -> Secret grafana-admin (admin-user, admin-password)
+  - ksops-generator.yaml # -> Secrets grafana-admin, alertmanager-discord

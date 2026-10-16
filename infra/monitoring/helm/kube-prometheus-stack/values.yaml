@@ -56,7 +56,47 @@ prometheus:
               storage: 6Gi
 
 alertmanager:
+  # Replaces the chart's default config (which sends everything to "null").
+  # The inhibit rules are copied from the chart defaults.
+  config:
+    global:
+      resolve_timeout: 5m
+    route:
+      receiver: discord
+      group_by: ["namespace", "alertname"]
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+      routes:
+        # Watchdog always fires (proves the pipeline works); InfoInhibitor is
+        # a helper. Neither should ping Discord.
+        - receiver: "null"
+          matchers: ['alertname =~ "Watchdog|InfoInhibitor"']
+    inhibit_rules:
+      - source_matchers: ["severity = critical"]
+        target_matchers: ["severity =~ warning|info"]
+        equal: ["namespace", "alertname"]
+      - source_matchers: ["severity = warning"]
+        target_matchers: ["severity = info"]
+        equal: ["namespace", "alertname"]
+      - source_matchers: ["alertname = InfoInhibitor"]
+        target_matchers: ["severity = info"]
+        equal: ["namespace"]
+      - target_matchers: ["alertname = InfoInhibitor"]
+    receivers:
+      - name: "null"
+      - name: discord
+        discord_configs:
+          # The URL is a secret, so it's read from a file: the Secret
+          # alertmanager-discord (SOPS, infra/monitoring) mounted via
+          # alertmanagerSpec.secrets below.
+          - webhook_url_file: /etc/alertmanager/secrets/alertmanager-discord/webhook-url
+            send_resolved: true
+    templates:
+      - /etc/alertmanager/config/*.tmpl
   alertmanagerSpec:
+    secrets:
+      - alertmanager-discord # -> /etc/alertmanager/secrets/alertmanager-discord/
     resources:
       requests:
         cpu: 10m
