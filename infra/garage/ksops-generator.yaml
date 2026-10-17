@@ -1,0 +1,11 @@
+# Decrypts Garage's rpc secret, admin token and metrics token at render time (Argo CD repo-server + KSOPS).
+apiVersion: viaduct.ai/v1
+kind: ksops
+metadata:
+  name: garage-secrets
+  annotations:
+    config.kubernetes.io/function: |
+      exec:
+        path: ksops
+files:
+  - ./garage-secrets.sops.yaml

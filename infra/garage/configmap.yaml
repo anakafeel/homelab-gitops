@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: garage
+data:
+  # Keys checked against the v2.4.1 configuration reference.
+  garage.toml: |
+    replication_factor = 1
+    consistency_mode = "consistent"
+    metadata_dir = "/var/lib/garage/meta"
+    metadata_snapshots_dir = "/var/lib/garage/meta-snapshots"
+    metadata_auto_snapshot_interval = "6h"
+    data_dir = "/var/lib/garage/data"
+    db_engine = "lmdb"
+    lmdb_map_size = "4GiB" # the meta PV is small; default is 1TiB of address space
+    block_size = "1M"
+    block_ram_buffer_max = "64MiB" # Pi has 4G RAM shared with Immich
+    compression_level = 1
+
+    rpc_bind_addr = "[::]:3901"
+    rpc_public_addr = "127.0.0.1:3901" # single node; set a real address if a second node joins
+    rpc_secret_file = "/etc/garage/secrets/rpc-secret"
+
+    [s3_api]
+    api_bind_addr = "[::]:3900"
+    s3_region = "garage"
+    root_domain = ".s3.garage.svc"
+
+    [admin]
+    api_bind_addr = "[::]:3903"
+    admin_token_file = "/etc/garage/secrets/admin-token"
+    metrics_token_file = "/etc/garage/secrets/metrics-token"
+    metrics_require_token = true
