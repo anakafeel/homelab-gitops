@@ -39,6 +39,7 @@ prometheus:
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
     probeSelectorNilUsesHelmValues: false
+    scrapeConfigSelectorNilUsesHelmValues: false
     resources:
       requests:
         cpu: 100m
@@ -142,6 +143,22 @@ grafana:
   # Exposed via infra/monitoring/grafana-ingress.yaml (Tailscale) instead.
   ingress:
     enabled: false
+  # AWS keys for the CloudWatch datasource, from the SOPS Secret
+  # grafana-cloudwatch (infra/monitoring). Grafana expands ${VAR} in
+  # provisioning files, so the keys never appear in a ConfigMap.
+  envFromSecret: grafana-cloudwatch
+  additionalDataSources:
+    - name: CloudWatch
+      uid: cloudwatch # the VaultPi Overview dashboard refers to this uid
+      type: cloudwatch
+      access: proxy
+      editable: false
+      jsonData:
+        authType: keys
+        defaultRegion: us-east-1
+      secureJsonData:
+        accessKey: ${AWS_ACCESS_KEY_ID}
+        secretKey: ${AWS_SECRET_ACCESS_KEY}
   # Dashboards and datasources are provisioned from config, so no PVC.
   persistence:
     enabled: false

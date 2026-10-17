@@ -1,0 +1,20 @@
+# Scrapes the cadvisor container that still runs on the Pi's Docker engine.
+# Immich, n8n, portainer and samba are Docker containers, and the kubelet's
+# built-in cAdvisor only sees k3s pods, so this is the only source of
+# per-container metrics for them. Remove once those apps move to k3s.
+# Node discovery (instead of a static IP) follows the Pi if its DHCP address changes.
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: docker-cadvisor
+  namespace: monitoring
+spec:
+  jobName: docker-cadvisor
+  kubernetesSDConfigs:
+    - role: Node
+  relabelings:
+    # Node discovery points at the kubelet (:10250); cadvisor publishes :8080 on the host.
+    - sourceLabels: [__address__]
+      regex: (.+):\d+
+      replacement: $1:8080
+      targetLabel: __address__
