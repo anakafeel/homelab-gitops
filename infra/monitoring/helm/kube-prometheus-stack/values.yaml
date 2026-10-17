@@ -69,10 +69,17 @@ alertmanager:
       group_interval: 5m
       repeat_interval: 12h
       routes:
-        # Watchdog always fires (proves the pipeline works); InfoInhibitor is
-        # a helper. Neither should ping Discord.
+        # Dead man's switch: Watchdog always fires, so re-sending it every
+        # minute pings healthchecks.io. If the pings stop (Pi, k3s,
+        # Prometheus or Alertmanager down), healthchecks.io alerts instead.
+        - receiver: healthchecks
+          matchers: ['alertname = "Watchdog"']
+          group_wait: 0s
+          group_interval: 1m
+          repeat_interval: 1m
+        # InfoInhibitor is a helper and should not ping Discord.
         - receiver: "null"
-          matchers: ['alertname =~ "Watchdog|InfoInhibitor"']
+          matchers: ['alertname = "InfoInhibitor"']
     inhibit_rules:
       - source_matchers: ["severity = critical"]
         target_matchers: ["severity =~ warning|info"]
@@ -93,11 +100,18 @@ alertmanager:
           # alertmanagerSpec.secrets below.
           - webhook_url_file: /etc/alertmanager/secrets/alertmanager-discord/webhook-url
             send_resolved: true
+      - name: healthchecks
+        webhook_configs:
+          # The ping URL is a secret too: Secret alertmanager-healthchecks
+          # (SOPS, infra/monitoring), mounted via alertmanagerSpec.secrets.
+          - url_file: /etc/alertmanager/secrets/alertmanager-healthchecks/ping-url
+            send_resolved: false
     templates:
       - /etc/alertmanager/config/*.tmpl
   alertmanagerSpec:
     secrets:
       - alertmanager-discord # -> /etc/alertmanager/secrets/alertmanager-discord/
+      - alertmanager-healthchecks # -> /etc/alertmanager/secrets/alertmanager-healthchecks/
     resources:
       requests:
         cpu: 10m
@@ -122,10 +136,6 @@ kube-state-metrics:
       memory: 192Mi
 
 prometheus-node-exporter:
-  # Host network: 9100 is still taken by the old Docker node_exporter.
-  service:
-    port: 9101
-    targetPort: 9101
   resources:
     requests:
       cpu: 10m

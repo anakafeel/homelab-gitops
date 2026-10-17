@@ -11,3 +11,4 @@ files:
   - ./grafana-admin.sops.yaml
   - ./alertmanager-discord.sops.yaml
   - ./grafana-cloudwatch.sops.yaml
+  - ./alertmanager-healthchecks.sops.yaml
