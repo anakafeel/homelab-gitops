@@ -44,6 +44,12 @@ variable "k3s_token" {
   sensitive   = true
 }
 
+variable "ssh_public_key" {
+  description = "SSH key for the default 'debian' user (debugging only)."
+  type        = string
+  default     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKB31181+40goO/Fey0QDfkiNQ2I/Q1Z2lggjKTKI6iJ" # laptop key, public
+}
+
 locals {
   name        = "lab-node"
   k3s_version = "v1.36.5+k3s1"               # match the server
@@ -89,7 +95,7 @@ resource "libvirt_cloudinit_disk" "seed" {
   name = "${local.name}-seed"
   user_data = templatefile("${path.module}/cloud-init.yaml.tftpl", {
     hostname          = local.name
-    ssh_key           = trimspace(file(pathexpand("~/.ssh/id_ed25519.pub")))
+    ssh_key           = var.ssh_public_key
     tailscale_authkey = var.tailscale_authkey
     k3s_version       = local.k3s_version
     k3s_server        = local.k3s_server
