@@ -14,7 +14,8 @@ spec:
     - role: Node
   relabelings:
     # Node discovery points at the kubelet (:10250); cadvisor publishes :8080 on the host.
-    - sourceLabels: [__address__]
+    - action: replace # API default; explicit so Argo CD shows no drift
+      sourceLabels: [__address__]
       regex: (.+):\d+
       replacement: $1:8080
       targetLabel: __address__
