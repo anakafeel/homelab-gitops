@@ -11,6 +11,7 @@ resources:
   - configmap.yaml
   - statefulset.yaml
   - service.yaml
+  - service-tailnet.yaml
   - servicemonitor.yaml
   - networkpolicy.yaml
 generators:
