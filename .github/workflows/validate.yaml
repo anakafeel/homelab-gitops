@@ -16,6 +16,8 @@ env:
   KUBECONFORM_SHA256: 9bc2bffbf71f261128533edaf912153948b7ff238f9a531ae6d34466ec287883
   KUBE_LINTER_VERSION: v0.8.3
   KUBE_LINTER_SHA256: 1a6d8419b11971372971fdbc22682b684ebfb7cf1c39591662d1b6ca736c41df
+  TOFU_VERSION: 1.13.1
+  TOFU_SHA256: 378ada19d4bc70c43732004e8159be771b23b9a5afdf059e5f8a2b3fa2c70a69
 
 jobs:
   validate:
@@ -48,7 +50,9 @@ jobs:
           echo "${KUBECONFORM_SHA256}  kc.tgz" | sha256sum -c -
           curl -sSLo kl.tgz "https://github.com/stackrox/kube-linter/releases/download/${KUBE_LINTER_VERSION}/kube-linter-linux.tar.gz"
           echo "${KUBE_LINTER_SHA256}  kl.tgz" | sha256sum -c -
-          tar xzf kc.tgz kubeconform && tar xzf kl.tgz kube-linter
+          curl -sSLo tofu.tgz "https://github.com/opentofu/opentofu/releases/download/v${TOFU_VERSION}/tofu_${TOFU_VERSION}_linux_amd64.tar.gz"
+          echo "${TOFU_SHA256}  tofu.tgz" | sha256sum -c -
+          tar xzf kc.tgz kubeconform && tar xzf kl.tgz kube-linter && tar xzf tofu.tgz tofu
           echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
 
       # Kustomize dirs without KSOPS generators must build (catches missing files).
@@ -72,3 +76,14 @@ jobs:
 
       - name: Best practices (kube-linter)
         run: kube-linter lint --config .kube-linter.yaml apps infra
+
+      # No state access here (Garage is only reachable on the tailnet):
+      # format and static validation only, providers come from the lock files.
+      - name: OpenTofu fmt + validate
+        run: |
+          tofu fmt -check -recursive -diff tofu
+          for d in tofu/*/; do
+            echo "validate $d"
+            tofu -chdir="$d" init -backend=false -input=false -lockfile=readonly > /dev/null
+            tofu -chdir="$d" validate
+          done
