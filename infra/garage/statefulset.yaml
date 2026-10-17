@@ -93,18 +93,24 @@ spec:
             secretName: garage-secrets
             defaultMode: 0440 # owner root + fsGroup 10001; nothing for "other"
   volumeClaimTemplates:
-    - metadata:
+    - apiVersion: v1 # API defaults written out so Argo CD shows no drift
+      kind: PersistentVolumeClaim
+      metadata:
         name: meta
       spec:
         accessModes: ["ReadWriteOnce"]
+        volumeMode: Filesystem
         storageClassName: garage-local
         resources:
           requests:
             storage: 5Gi
-    - metadata:
+    - apiVersion: v1 # API defaults written out so Argo CD shows no drift
+      kind: PersistentVolumeClaim
+      metadata:
         name: data
       spec:
         accessModes: ["ReadWriteOnce"]
+        volumeMode: Filesystem
         storageClassName: garage-local
         resources:
           requests:

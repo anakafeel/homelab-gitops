@@ -12,6 +12,12 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: garage
+  # The API server stores a status: {phase: Pending} in each volumeClaimTemplate.
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jqPathExpressions:
+        - .spec.volumeClaimTemplates[]?.status
   syncPolicy:
     automated:
       prune: true
