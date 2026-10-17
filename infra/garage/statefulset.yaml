@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: garage
+  labels:
+    app.kubernetes.io/name: garage
+spec:
+  replicas: 1 # single node, replication_factor = 1
+  serviceName: garage
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: garage
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: garage
+      annotations:
+        # bump to roll the pod after editing the ConfigMap
+        homelab/config-rev: "1"
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001 # kubelet chowns the local PVs (root-owned on the host) to this group
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: garage
+          image: docker.io/dxflrs/garage:v2.4.1@sha256:9c96caa2612d3411acc5b0e6701fb238dbfba33e533a6d7d3d811a4b12d0d020
+          command: ["/garage", "-c", "/etc/garage/garage.toml", "server"]
+          ports:
+            - name: s3
+              containerPort: 3900
+            - name: rpc
+              containerPort: 3901
+            - name: admin
+              containerPort: 3903
+          # /health returns 503 until the cluster layout is applied (one-time
+          # `garage layout assign/apply`), so the pod stays NotReady until then.
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: admin
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: rpc
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: config
+              mountPath: /etc/garage/garage.toml
+              subPath: garage.toml
+              readOnly: true
+            - name: secrets
+              mountPath: /etc/garage/secrets
+              readOnly: true
+            - name: meta
+              mountPath: /var/lib/garage/meta
+              subPath: meta
+            - name: meta
+              mountPath: /var/lib/garage/meta-snapshots
+              subPath: meta-snapshots
+            - name: data
+              mountPath: /var/lib/garage/data
+      volumes:
+        - name: config
+          configMap:
+            name: garage
+        - name: secrets
+          secret:
+            secretName: garage-secrets
+            defaultMode: 0440 # Garage refuses world-readable secret files
+  volumeClaimTemplates:
+    - metadata:
+        name: meta
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: garage-local
+        resources:
+          requests:
+            storage: 5Gi
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: garage-local
+        resources:
+          requests:
+            storage: 49Gi

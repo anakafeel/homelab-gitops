@@ -1,0 +1,17 @@
+# Garage: single-node S3-compatible object store (self-hosted S3, Phase 5).
+# Disk setup on the Pi is manual and documented in the vault note
+# "Mini Projects/Self-hosted S3.md": data lives in a 50G ext4 loop image on the
+# HDD (/mnt/garage-data, hard cap), metadata on the USB disk.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: garage
+resources:
+  - namespace.yaml
+  - storage.yaml
+  - configmap.yaml
+  - statefulset.yaml
+  - service.yaml
+  - servicemonitor.yaml
+  - networkpolicy.yaml
+generators:
+  - ksops-generator.yaml # -> Secret garage-secrets

@@ -1,0 +1,19 @@
+# Default deny ingress, then allow only what needs Garage. kubectl exec and
+# port-forward don't pass through NetworkPolicy, so admin bootstrap still works.
+# Add backup consumers (cnpg, k8up) to the S3 rule when they arrive.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: garage
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: garage
+  policyTypes: ["Ingress"]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: admin # /metrics

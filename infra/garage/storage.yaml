@@ -1,0 +1,50 @@
+# Hand-written local PVs, pre-bound to the StatefulSet's claims via claimRef.
+# Retain: deleting the app or the PVCs never deletes Garage's data.
+# Never use the local-path provisioner here: it would put data on the SD card.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: garage-meta
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes: ["ReadWriteOnce"]
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: garage-local
+  claimRef:
+    namespace: garage
+    name: meta-garage-0
+  local:
+    path: /mnt/docker-root/garage # USB disk; holds meta/ (LMDB) and meta-snapshots/
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values: ["anakafeel-pi"]
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: garage-data
+spec:
+  capacity:
+    storage: 49Gi
+  accessModes: ["ReadWriteOnce"]
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: garage-local
+  claimRef:
+    namespace: garage
+    name: data-garage-0
+  local:
+    # 50G ext4 loop image on the HDD. The mountpoint is chattr +i, so if the
+    # image isn't mounted Garage gets write errors instead of filling the SD card.
+    path: /mnt/garage-data
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values: ["anakafeel-pi"]
