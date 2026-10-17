@@ -11,3 +11,9 @@
 .swarm/
 agentdb.rvf*
 ruvector.db
+
+# OpenTofu: local caches, state and plans (state lives in the cluster / Garage)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
