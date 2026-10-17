@@ -17,3 +17,10 @@ spec:
               kubernetes.io/metadata.name: monitoring
       ports:
         - port: admin # /metrics
+    # Tailscale proxy for service-tailnet.yaml (S3 for CI).
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: tailscale
+      ports:
+        - port: s3

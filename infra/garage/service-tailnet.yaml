@@ -1,0 +1,21 @@
+# S3 API on the tailnet for CI (OpenTofu state): the Tailscale operator creates
+# a proxy device "garage-s3" -> http://garage-s3.<tailnet>.ts.net:3900.
+# S3 port only; the admin API (3903) stays in-cluster. The tailnet policy lets
+# only tag:ci reach tag:k8s-garage:3900. Plain HTTP inside WireGuard.
+apiVersion: v1
+kind: Service
+metadata:
+  name: garage-s3
+  labels:
+    app.kubernetes.io/name: garage-s3 # not "garage": keeps it out of the ServiceMonitor
+  annotations:
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: garage-s3
+    tailscale.com/tags: tag:k8s-garage
+spec:
+  selector:
+    app.kubernetes.io/name: garage
+  ports:
+    - name: s3
+      port: 3900
+      targetPort: s3
