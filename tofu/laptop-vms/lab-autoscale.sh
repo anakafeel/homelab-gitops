@@ -33,7 +33,11 @@ if [[ $state != running ]]; then
   exit 0
 fi
 
-if ((busy > 0 || pending > 0)) || [[ ! -e $STAMP ]]; then
+# The idle clock only runs while the node is Ready: a booting or rejoining VM
+# (or one just recreated by tofu) is never "idle".
+ready=$("${KUBECTL[@]}" get node "$VM" -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null || true)
+
+if ((busy > 0 || pending > 0)) || [[ $ready != True || ! -e $STAMP ]]; then
   touch "$STAMP"
   exit 0
 fi
