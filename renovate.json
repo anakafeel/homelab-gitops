@@ -27,10 +27,9 @@
   ],
   "packageRules": [
     {
-      "description": "Portfolio deploys stay deliberate: a digest-bump PR is the only deploy path, never merged automatically.",
+      "description": "Portfolio CI pins its own digest right after each build (auto-merging PR from anakafeel/portfolio-website), so Renovate leaves this image alone.",
       "matchPackageNames": ["docker.io/anakafeel/nextjs-portfolio", "anakafeel/nextjs-portfolio"],
-      "automerge": false,
-      "commitMessageTopic": "portfolio image"
+      "enabled": false
     }
   ]
 }
