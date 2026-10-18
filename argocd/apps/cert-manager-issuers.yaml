@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager-issuers
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2" # after the cert-manager CRDs (wave 1)
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/anakafeel/homelab-gitops.git
+    targetRevision: main
+    path: infra/cert-manager
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - SkipDryRunOnMissingResource=true # ClusterIssuer CRD comes from cert-manager
