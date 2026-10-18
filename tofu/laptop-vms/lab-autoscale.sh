@@ -25,6 +25,13 @@ busy=$(jq --arg n "$VM" '[.items[] | select(.spec.nodeName == $n)
   | select(all(.metadata.ownerReferences[]?; .kind != "DaemonSet"))] | length' <<<"$pods")
 
 if [[ $state != running ]]; then
+  # Like Cluster Autoscaler, remove the Node of a stopped VM: a NotReady node
+  # pages (KubeNodeNotReady, TargetDown, stuck DaemonSets). k3s re-registers
+  # it on the next boot.
+  if [[ $state == "shut off" ]] && "${KUBECTL[@]}" get node "$VM" >/dev/null 2>&1; then
+    echo "$VM is off: deleting its Node"
+    "${KUBECTL[@]}" delete node "$VM" --wait=false
+  fi
   if ((pending > 0)); then
     echo "$pending pending lab pod(s): starting $VM"
     touch "$STAMP" # idle clock starts at boot

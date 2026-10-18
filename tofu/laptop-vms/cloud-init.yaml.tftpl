@@ -3,6 +3,15 @@ hostname: ${hostname}
 ssh_authorized_keys:
   - ${ssh_key}
 
+# lab-autoscale.sh deletes the Node when it stops the VM. On the next boot the
+# server rejects the cached kubelet certs ("unable to verify node identity") and
+# k3s's token fallback fails, so drop them: the agent re-registers with its token.
+write_files:
+  - path: /etc/systemd/system/k3s-agent.service.d/fresh-node-certs.conf
+    content: |
+      [Service]
+      ExecStartPre=-/bin/rm -f /var/lib/rancher/k3s/agent/client-kubelet.crt /var/lib/rancher/k3s/agent/client-kubelet.key /var/lib/rancher/k3s/agent/serving-kubelet.crt /var/lib/rancher/k3s/agent/serving-kubelet.key
+
 # One script with set -e: if `tailscale up` fails (bad or unapproved key), stop
 # there instead of installing k3s with an empty --node-ip.
 runcmd:
