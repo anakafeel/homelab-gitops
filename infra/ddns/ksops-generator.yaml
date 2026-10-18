@@ -1,0 +1,11 @@
+# Decrypts the DuckDNS token at render time (Argo CD repo-server + KSOPS).
+apiVersion: viaduct.ai/v1
+kind: ksops
+metadata:
+  name: ddns-secrets
+  annotations:
+    config.kubernetes.io/function: |
+      exec:
+        path: ksops
+files:
+  - ./duckdns.sops.yaml

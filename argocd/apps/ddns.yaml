@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ddns
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/anakafeel/homelab-gitops.git
+    targetRevision: main
+    path: infra/ddns
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ddns
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true # no decrypted copy in last-applied annotation
