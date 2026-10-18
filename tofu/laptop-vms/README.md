@@ -14,6 +14,8 @@ cluster over Tailscale. Use it for a lab session, then destroy it.
 - libvirt + qemu installed, `libvirtd.socket` enabled, user in group `libvirt`,
   network `default` active. CachyOS needs `TimeoutStartSec=120` for libvirtd
   (its 15s default is too short for the first start).
+- ufw (on by default in CachyOS) drops the VM's DHCP/DNS on `virbr0`:
+  `sudo ufw allow in on virbr0 && sudo ufw route allow in on virbr0 && sudo ufw route allow out on virbr0`.
 - Tailnet policy: `tag:lab-node` grants (VM -> Pi tcp:6443, udp:8472;
   Pi -> VM tcp:10250, udp:8472).
 

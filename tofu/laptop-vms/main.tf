@@ -132,7 +132,25 @@ resource "libvirt_domain" "lab" {
     type_machine = "q35"
   }
 
+  # Without ACPI the guest can't enumerate q35's PCIe bus: no disk, no NIC.
+  features = {
+    acpi = true
+    apic = {}
+  }
+
   devices = {
+    # `virsh console lab-node` for boot debugging.
+    consoles = [
+      {
+        target = { type = "serial", port = 0 }
+      },
+    ]
+    # With no video device the Debian kernel resets right after GRUB.
+    videos = [
+      {
+        model = { type = "vga" }
+      },
+    ]
     disks = [
       {
         source = {
