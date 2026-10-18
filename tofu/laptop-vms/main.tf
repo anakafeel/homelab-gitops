@@ -1,8 +1,8 @@
-# Throwaway k3s agent VM on the laptop ("self-hosted EC2"). It exists only for a
-# lab session: `tofu apply` creates it and it joins the cluster over Tailscale,
-# `tofu destroy` removes it. It never autostarts and powers itself off 2h after
-# every boot, so it can't sit in RAM unnoticed. Applied from the laptop only:
-# CI can't reach the laptop's libvirt. See README.md.
+# Scale-to-zero k3s agent VM on the laptop ("self-hosted EC2"). lab-autoscale.sh
+# (systemd user timer) starts it when pods that tolerate homelab/lab are
+# Pending and shuts it down after 15 idle minutes; it rejoins the cluster over
+# Tailscale on every boot. Applied from the laptop only: CI can't reach the
+# laptop's libvirt. See README.md.
 terraform {
   required_version = ">= 1.10.0"
 
@@ -33,13 +33,13 @@ provider "libvirt" {
 }
 
 variable "tailscale_authkey" {
-  description = "Ephemeral, pre-approved Tailscale auth key tagged tag:lab-node."
+  description = "Non-ephemeral, pre-approved Tailscale auth key tagged tag:lab-node (the node must survive reboots)."
   type        = string
   sensitive   = true
 }
 
 variable "k3s_token" {
-  description = "Short-lived k3s bootstrap token (`k3s token create --ttl 24h` on the Pi)."
+  description = "Non-expiring k3s bootstrap token (`k3s token create --ttl 0` on the Pi; revoke with `k3s token delete`)."
   type        = string
   sensitive   = true
 }
@@ -124,7 +124,7 @@ resource "libvirt_domain" "lab" {
   memory      = 2048
   memory_unit = "MiB"
   running     = true
-  autostart   = false # never starts with the laptop
+  autostart   = false # lab-autoscale.sh starts it on demand
 
   os = {
     type         = "hvm"
@@ -132,7 +132,30 @@ resource "libvirt_domain" "lab" {
     type_machine = "q35"
   }
 
+  # Without ACPI the guest can't enumerate q35's PCIe bus: no disk, no NIC.
+  features = {
+    acpi = true
+    apic = {}
+  }
+
   devices = {
+    # `virsh console lab-node` for boot debugging.
+    consoles = [
+      {
+        target = { type = "serial", port = 0 }
+      },
+    ]
+    # With no video device the Debian kernel resets right after GRUB.
+    # Free page reporting hands RAM the guest frees back to the laptop.
+    mem_balloon = {
+      model               = "virtio"
+      free_page_reporting = "on"
+    }
+    videos = [
+      {
+        model = { type = "vga" }
+      },
+    ]
     disks = [
       {
         source = {

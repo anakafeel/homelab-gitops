@@ -3,19 +3,20 @@ hostname: ${hostname}
 ssh_authorized_keys:
   - ${ssh_key}
 
-# bootcmd runs on every boot: power off 2h later, so a forgotten VM frees RAM.
-bootcmd:
-  - [shutdown, -h, "+120", "lab VM: automatic power-off after 2h"]
-
+# One script with set -e: if `tailscale up` fails (bad or unapproved key), stop
+# there instead of installing k3s with an empty --node-ip.
 runcmd:
-  - curl -fsSL https://tailscale.com/install.sh | sh
-  - tailscale up --auth-key='${tailscale_authkey}' --hostname=${hostname} --advertise-tags=tag:lab-node
-  # Agent talks to the Pi over the tailnet; flannel VXLAN rides tailscale0.
-  - >-
-    curl -sfL https://get.k3s.io |
-    INSTALL_K3S_VERSION='${k3s_version}' K3S_URL='${k3s_server}' K3S_TOKEN='${k3s_token}'
-    sh -s - agent
-    --node-ip "$(tailscale ip -4)"
-    --flannel-iface tailscale0
-    --node-label homelab/lab=true
-    --node-taint homelab/lab=true:NoSchedule
+  - - bash
+    - -euc
+    - |
+      curl -fsSL https://tailscale.com/install.sh | sh
+      tailscale up --auth-key='${tailscale_authkey}' --hostname=${hostname} --advertise-tags=tag:lab-node --timeout=120s
+      ip=$(tailscale ip -4)
+      # Agent talks to the Pi over the tailnet; flannel VXLAN rides tailscale0.
+      curl -sfL https://get.k3s.io |
+        INSTALL_K3S_VERSION='${k3s_version}' K3S_URL='${k3s_server}' K3S_TOKEN='${k3s_token}' \
+        sh -s - agent \
+        --node-ip "$ip" \
+        --flannel-iface tailscale0 \
+        --node-label homelab/lab=true \
+        --node-taint homelab/lab=true:NoSchedule

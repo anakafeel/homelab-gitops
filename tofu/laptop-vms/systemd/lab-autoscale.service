@@ -1,0 +1,6 @@
+[Unit]
+Description=Scale lab-node VM to demand (start on pending lab pods, stop when idle)
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/lab-autoscale.sh
