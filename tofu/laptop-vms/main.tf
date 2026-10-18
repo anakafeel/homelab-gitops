@@ -1,7 +1,8 @@
-# Always-on k3s agent VM on the laptop ("self-hosted EC2"). It starts with the
-# laptop and rejoins the cluster over Tailscale after every boot or resume; while
-# the laptop is off the Node is just NotReady. Applied from the laptop only:
-# CI can't reach the laptop's libvirt. See README.md.
+# Scale-to-zero k3s agent VM on the laptop ("self-hosted EC2"). lab-autoscale.sh
+# (systemd user timer) starts it when pods that tolerate homelab/lab are
+# Pending and shuts it down after 15 idle minutes; it rejoins the cluster over
+# Tailscale on every boot. Applied from the laptop only: CI can't reach the
+# laptop's libvirt. See README.md.
 terraform {
   required_version = ">= 1.10.0"
 
@@ -123,7 +124,7 @@ resource "libvirt_domain" "lab" {
   memory      = 2048
   memory_unit = "MiB"
   running     = true
-  autostart   = true # starts with libvirtd.service at laptop boot
+  autostart   = false # lab-autoscale.sh starts it on demand
 
   os = {
     type         = "hvm"
@@ -145,6 +146,11 @@ resource "libvirt_domain" "lab" {
       },
     ]
     # With no video device the Debian kernel resets right after GRUB.
+    # Free page reporting hands RAM the guest frees back to the laptop.
+    mem_balloon = {
+      model               = "virtio"
+      free_page_reporting = "on"
+    }
     videos = [
       {
         model = { type = "vga" }

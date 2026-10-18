@@ -1,20 +1,27 @@
 # tofu/laptop-vms
 
-An always-on k3s agent VM on the laptop (libvirt/KVM), joined to the Pi's
+A scale-to-zero k3s agent VM on the laptop (libvirt/KVM), joined to the Pi's
 cluster over Tailscale. Nothing to start or stop by hand.
 
-- 2 vCPU, 2 GiB RAM, 20 GiB thin disk.
-- Autostarts with the laptop (`libvirtd.service`), pauses on suspend, and
-  rejoins on its own: the Tailscale node is non-ephemeral and the k3s join
-  token never expires. Laptop off: `lab-node` is NotReady, nothing else changes.
+- 2 vCPU, 2 GiB RAM (free pages go back to the laptop), 20 GiB thin disk.
+- `lab-autoscale.sh`, run every minute by a systemd user timer, starts the VM
+  when a pod that tolerates `homelab/lab` is Pending and shuts it down after
+  15 minutes with no workload pods (DaemonSets don't count). It rejoins on its
+  own: the Tailscale node is non-ephemeral and the k3s join token never
+  expires. While it's off, `lab-node` is NotReady.
+- To use it: give a pod `nodeSelector: {homelab/lab: "true"}` and a
+  toleration for `homelab/lab=true:NoSchedule`. It runs ~1 min later.
 - Tainted `homelab/lab=true:NoSchedule`: only pods that tolerate it run there.
 - State: `s3://tofu-state/laptop-vms/terraform.tfstate` in Garage.
 
 ## Prerequisites (one time)
 
-- libvirt + qemu installed, `libvirtd.service` enabled (`systemctl enable
-  libvirtd.service`; the socket alone won't start autostart VMs at boot), user
-  in group `libvirt`, network `default` active. CachyOS needs
+- Autoscaler: `install -m755 lab-autoscale.sh ~/.local/bin/ && cp
+  systemd/lab-autoscale.* ~/.config/systemd/user/ && systemctl --user
+  daemon-reload && systemctl --user enable --now lab-autoscale.timer`.
+  Logs: `journalctl --user -u lab-autoscale`.
+- libvirt + qemu installed, `libvirtd.socket` enabled, user in group
+  `libvirt`, network `default` active. CachyOS needs
   `TimeoutStartSec=120` for libvirtd (its 15s default is too short for the
   first start).
 - ufw (on by default in CachyOS) drops the VM's DHCP/DNS on `virbr0`:
