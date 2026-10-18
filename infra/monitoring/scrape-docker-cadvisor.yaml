@@ -19,3 +19,7 @@ spec:
       regex: (.+):\d+
       replacement: $1:8080
       targetLabel: __address__
+    # Only the Pi runs Docker; lab-node (laptop VM) would be a permanent TargetDown.
+    - action: keep
+      sourceLabels: [__meta_kubernetes_node_name]
+      regex: anakafeel-pi
