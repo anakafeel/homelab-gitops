@@ -1,7 +1,6 @@
-# Throwaway k3s agent VM on the laptop ("self-hosted EC2"). It exists only for a
-# lab session: `tofu apply` creates it and it joins the cluster over Tailscale,
-# `tofu destroy` removes it. It never autostarts and powers itself off 2h after
-# every boot, so it can't sit in RAM unnoticed. Applied from the laptop only:
+# Always-on k3s agent VM on the laptop ("self-hosted EC2"). It starts with the
+# laptop and rejoins the cluster over Tailscale after every boot or resume; while
+# the laptop is off the Node is just NotReady. Applied from the laptop only:
 # CI can't reach the laptop's libvirt. See README.md.
 terraform {
   required_version = ">= 1.10.0"
@@ -33,13 +32,13 @@ provider "libvirt" {
 }
 
 variable "tailscale_authkey" {
-  description = "Ephemeral, pre-approved Tailscale auth key tagged tag:lab-node."
+  description = "Non-ephemeral, pre-approved Tailscale auth key tagged tag:lab-node (the node must survive reboots)."
   type        = string
   sensitive   = true
 }
 
 variable "k3s_token" {
-  description = "Short-lived k3s bootstrap token (`k3s token create --ttl 24h` on the Pi)."
+  description = "Non-expiring k3s bootstrap token (`k3s token create --ttl 0` on the Pi; revoke with `k3s token delete`)."
   type        = string
   sensitive   = true
 }
@@ -124,7 +123,7 @@ resource "libvirt_domain" "lab" {
   memory      = 2048
   memory_unit = "MiB"
   running     = true
-  autostart   = false # never starts with the laptop
+  autostart   = true # starts with libvirtd.service at laptop boot
 
   os = {
     type         = "hvm"
