@@ -24,7 +24,7 @@ spec:
             severity: warning
           annotations:
             summary: "TLS cert for {{ $labels.instance }} expires in {{ $value | humanize }} days"
-            description: "Edge certs are managed by Cloudflare; if this fires, check the Cloudflare SSL/TLS dashboard."
+            description: "cert-manager renews Let's Encrypt certs 30 days before expiry. If this fires, check `kubectl get certificate -A` and the ACME challenge (router :80 forward, DuckDNS record)."
     - name: disks
       rules:
         # / = SD card, /mnt/docker-root = USB disk (k3s + Docker data),
