@@ -1,0 +1,131 @@
+# n8n, moved from Docker (/home/anakafeel/n8n on the Pi). Same image recipe
+# (images/n8n, built by .github/workflows/images.yaml), same uid 1000, same
+# host paths, so the photo workflows' Execute Command nodes see exactly what
+# they saw in Docker. hostPath ties it to the Pi, which is where the HDD is.
+# Data: a copy of the Docker volume at /mnt/docker-root/n8n (the original
+# volume is left as-is for rollback). Its `config` file holds the encryption
+# key for saved credentials, so it must move with the database.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate # SQLite: never two writers
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: n8n
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: n8n
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: anakafeel-pi
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: n8n
+          image: ghcr.io/anakafeel/n8n-vaultpi@sha256:bf36813f8ccb2932c03c5b7cd0031941d850af882264d02a3a69d59b6dc911b8
+          ports:
+            - name: http
+              containerPort: 5678
+          envFrom:
+            - secretRef:
+                name: n8n-env
+          env:
+            # Served at https://n8n.<tailnet>.ts.net by the Tailscale operator.
+            - name: N8N_HOST
+              value: n8n.tail15e8c8.ts.net
+            - name: N8N_PORT
+              value: "5678"
+            - name: N8N_PROTOCOL
+              value: https
+            - name: WEBHOOK_URL
+              value: https://n8n.tail15e8c8.ts.net/
+            - name: N8N_PROXY_HOPS
+              value: "1"
+            - name: GENERIC_TIMEZONE
+              value: UTC
+            - name: TZ
+              value: UTC
+            # The quarantine/duplicate-review Code nodes read
+            # VAULTPI_QUARANTINE_TOKEN via $env.
+            - name: N8N_BLOCK_ENV_ACCESS_IN_NODE
+              value: "false"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true # writes go to the mounts below and /tmp
+            capabilities:
+              drop: ["ALL"]
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 50m
+              memory: 192Mi
+            limits:
+              memory: 768Mi
+          volumeMounts:
+            - name: data
+              mountPath: /home/node/.n8n
+            - name: tmp
+              mountPath: /tmp
+            # Photo-search scripts, read-only, at their host path.
+            - name: vaultpi
+              mountPath: /home/anakafeel/vaultpi
+              readOnly: true
+            # quarantine_file.py's audit log (narrow rw over the ro mount).
+            - name: vaultpi-logs
+              mountPath: /home/anakafeel/vaultpi/logs
+            - name: aws
+              mountPath: /home/node/.aws
+              readOnly: true
+            # Quarantine moves files on the HDD (and horror-shorts writes renders there).
+            - name: hdd
+              mountPath: /mnt/vaultpi-hdd
+            - name: horror-shorts
+              mountPath: /opt/horror-shorts-autopilot
+              readOnly: true
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 512Mi
+        - name: data
+          hostPath:
+            path: /mnt/docker-root/n8n
+            type: Directory
+        - name: vaultpi
+          hostPath:
+            path: /home/anakafeel/vaultpi
+            type: Directory
+        - name: vaultpi-logs
+          hostPath:
+            path: /home/anakafeel/vaultpi/logs
+            type: Directory
+        - name: aws
+          hostPath:
+            path: /home/anakafeel/.aws
+            type: Directory
+        - name: hdd
+          hostPath:
+            path: /mnt/vaultpi-hdd
+            type: Directory
+        - name: horror-shorts
+          hostPath:
+            path: /home/anakafeel/horror-shorts-autopilot
+            type: Directory

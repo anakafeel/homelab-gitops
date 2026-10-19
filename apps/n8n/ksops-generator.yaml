@@ -1,0 +1,11 @@
+# Decrypts n8n-env.sops.yaml (the Quarantine Duplicate webhook's shared token).
+apiVersion: viaduct.ai/v1
+kind: ksops
+metadata:
+  name: n8n-secrets
+  annotations:
+    config.kubernetes.io/function: |
+      exec:
+        path: ksops
+files:
+  - ./n8n-env.sops.yaml
