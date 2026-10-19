@@ -10,7 +10,7 @@
 # host - it has no python3 and no access to ~/vaultpi by default. This adds
 # just enough to run the existing photo-search scripts (boto3, numpy) via
 # Alpine's own prebuilt apk packages, so nothing needs compiling on-device.
-FROM n8nio/n8n:1.106.3
+FROM n8nio/n8n:1.123.85
 
 USER root
 RUN apk add --no-cache python3 py3-boto3 py3-numpy
