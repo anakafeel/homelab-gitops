@@ -6,7 +6,7 @@
 terraform {
   required_version = ">= 1.10.0"
 
-  # State in Garage, same setup as tofu/cloudflare.
+  # State in Garage (s3 backend, path-style), like the other stacks.
   backend "s3" {
     bucket                      = "tofu-state"
     key                         = "laptop-vms/terraform.tfstate"

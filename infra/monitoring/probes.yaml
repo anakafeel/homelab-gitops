@@ -1,5 +1,5 @@
 # Probes the public site end to end from inside the cluster:
-# DNS -> Cloudflare -> tunnel -> cloudflared -> Traefik -> portfolio.
+# DNS (is-a.dev -> DuckDNS) -> home router :443 -> Traefik -> portfolio.
 # Produces probe_success, probe_http_status_code, probe_ssl_earliest_cert_expiry.
 apiVersion: monitoring.coreos.com/v1
 kind: Probe
@@ -15,4 +15,4 @@ spec:
   targets:
     staticConfig:
       static:
-        - https://saimhashmi.xyz
+        - https://saimhashmi.is-a.dev
