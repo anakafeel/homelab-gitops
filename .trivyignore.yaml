@@ -1,0 +1,10 @@
+# Accepted trivy findings. Each needs a reason; CI fails on anything else at
+# HIGH/CRITICAL (see .github/workflows/validate.yaml).
+misconfigurations:
+  - id: KSV-0109 # "ConfigMap with secrets"
+    paths:
+      - infra/garage/configmap.yaml
+    statement: >-
+      False positive: garage.toml only names secret *files* (rpc_secret_file,
+      admin_token_file, metrics_token_file) and sets metrics_require_token =
+      true. The secrets themselves are SOPS Secrets mounted at /etc/garage/secrets.

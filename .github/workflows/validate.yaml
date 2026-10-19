@@ -18,6 +18,10 @@ env:
   KUBE_LINTER_SHA256: 1a6d8419b11971372971fdbc22682b684ebfb7cf1c39591662d1b6ca736c41df
   TOFU_VERSION: 1.13.1
   TOFU_SHA256: 378ada19d4bc70c43732004e8159be771b23b9a5afdf059e5f8a2b3fa2c70a69
+  TRIVY_VERSION: 0.75.0
+  TRIVY_SHA256: c6e65abddb348e25f10549df887045629cf28cc72453cd1c63acb717316b3f3f
+  TFLINT_VERSION: v0.64.0
+  TFLINT_SHA256: cca9d13e2e1d7a2c627af60ff899a3c9b74212899416aeb96ec764d2ef954537
 
 jobs:
   validate:
@@ -52,7 +56,14 @@ jobs:
           echo "${KUBE_LINTER_SHA256}  kl.tgz" | sha256sum -c -
           curl -sSLo tofu.tgz "https://github.com/opentofu/opentofu/releases/download/v${TOFU_VERSION}/tofu_${TOFU_VERSION}_linux_amd64.tar.gz"
           echo "${TOFU_SHA256}  tofu.tgz" | sha256sum -c -
+          # trivy and tflint as checksummed binaries, not their GitHub Actions
+          # (trivy-action's tags were hijacked in a 2026 supply-chain attack).
+          curl -sSLo trivy.tgz "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz"
+          echo "${TRIVY_SHA256}  trivy.tgz" | sha256sum -c -
+          curl -sSLo tflint.zip "https://github.com/terraform-linters/tflint/releases/download/${TFLINT_VERSION}/tflint_linux_amd64.zip"
+          echo "${TFLINT_SHA256}  tflint.zip" | sha256sum -c -
           tar xzf kc.tgz kubeconform && tar xzf kl.tgz kube-linter && tar xzf tofu.tgz tofu
+          tar xzf trivy.tgz trivy && unzip -q tflint.zip tflint
           echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
 
       # Kustomize dirs without KSOPS generators must build (catches missing files).
@@ -87,3 +98,17 @@ jobs:
             tofu -chdir="$d" init -backend=false -input=false -lockfile=readonly > /dev/null
             tofu -chdir="$d" validate
           done
+
+      - name: OpenTofu lint (tflint)
+        run: |
+          for d in tofu/*/; do
+            echo "tflint $d"
+            tflint --chdir="$d" --format compact
+          done
+
+      # Misconfigurations in our manifests and OpenTofu code (HIGH/CRITICAL fail).
+      # Accepted exceptions live in .trivyignore.yaml, each with a reason.
+      - name: Misconfiguration scan (trivy)
+        run: |
+          trivy config --quiet --exit-code 1 --severity HIGH,CRITICAL \
+            --skip-files '**/*.sops.yaml' --ignorefile .trivyignore.yaml .
