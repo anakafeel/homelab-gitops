@@ -1,0 +1,52 @@
+# Builds the custom images this repo deploys (today: n8n) on a native arm64
+# runner and pushes them to GHCR with the built-in token (no stored secret).
+# Deploys pin the digest printed by the run in apps/<name>/; nothing here
+# changes the cluster by itself.
+name: images
+
+on:
+  push:
+    branches: [main]
+    paths: ["images/**", ".github/workflows/images.yaml"]
+  pull_request:
+    paths: ["images/**", ".github/workflows/images.yaml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  TRIVY_VERSION: 0.75.0
+  TRIVY_SHA256: a1ee9f6ffb7d112b64ff726a2a0717c21175c1114361391f4a132956751a13b3 # Linux-ARM64.tar.gz
+
+jobs:
+  n8n:
+    runs-on: ubuntu-26.04-arm
+    env:
+      IMAGE: ghcr.io/anakafeel/n8n-vaultpi
+      TAG: "1.106.3" # keep in step with images/n8n/Dockerfile's FROM
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Build (linux/arm64)
+        run: docker build --platform linux/arm64 -t "$IMAGE:$TAG-${GITHUB_SHA::7}" images/n8n
+
+      # Report only: n8n is pinned to 1.106.3 (newer releases crash on the Pi),
+      # so its known CVEs can't be fixed by upgrading. It's reachable only on
+      # the tailnet. trivy is a checksummed binary (trivy-action was hijacked).
+      - name: Vulnerability report (trivy)
+        run: |
+          curl -sSLo /tmp/trivy.tgz "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-ARM64.tar.gz"
+          echo "${TRIVY_SHA256}  /tmp/trivy.tgz" | sha256sum -c -
+          tar xzf /tmp/trivy.tgz -C /tmp trivy
+          /tmp/trivy image --quiet --ignore-unfixed --severity HIGH,CRITICAL --exit-code 0 "$IMAGE:$TAG-${GITHUB_SHA::7}"
+
+      - name: Push to GHCR
+        if: github.event_name != 'pull_request'
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker push "$IMAGE:$TAG-${GITHUB_SHA::7}"
+          digest=$(docker inspect --format '{{index .RepoDigests 0}}' "$IMAGE:$TAG-${GITHUB_SHA::7}")
+          echo "### Pushed \`$digest\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "pin: $digest"
