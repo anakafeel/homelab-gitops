@@ -1,4 +1,4 @@
-# Never commit plaintext secrets. Phase 2 adds SOPS-encrypted *.sops.yaml instead.
+# Never commit plaintext secrets. Encrypted secrets are *.sops.yaml (SOPS + age).
 *.json
 !renovate.json
 # Grafana dashboards are plain config (no credentials)

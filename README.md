@@ -40,7 +40,8 @@ flowchart LR
     PR["Push to portfolio repo"] --> GA["GitHub Actions"]
     GA --> B["Build amd64 and arm64 images"]
     B --> SM["arm64 smoke test"]
-    SM --> DH["Docker Hub"]
+    SM --> TV["trivy scan<br/>(fixable CRITICAL blocks)"]
+    TV --> DH["Docker Hub"]
     DH --> CI2["CI opens a PR here<br/>pinning the new digest"]
     CI2 --> V2["validate check passes"]
     V2 --> AM["Auto-merge"]
@@ -49,7 +50,8 @@ flowchart LR
 ```
 
 The portfolio repo builds both architectures on native runners. The arm64
-image must serve pages before it is pushed. Then CI pins the image digest in
+image must serve pages, and trivy must find no fixable critical
+vulnerabilities, before anything deploys. Then CI pins the image digest in
 a PR here. The PR merges once `validate` passes, and Argo CD rolls it out.
 
 ### GitOps layout
