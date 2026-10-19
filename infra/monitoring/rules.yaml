@@ -16,7 +16,7 @@ spec:
             severity: critical
           annotations:
             summary: "{{ $labels.instance }} is down"
-            description: "The blackbox probe has failed for 2 minutes. Check probe_http_status_code, the cloudflared pods and the portfolio deployment."
+            description: "The blackbox probe has failed for 2 minutes. Check probe_http_status_code, the DuckDNS CronJob (ddns), the router port-forward and the portfolio deployment."
         - alert: TLSCertExpiringSoon
           expr: (probe_ssl_earliest_cert_expiry{job="public-site"} - time()) / 86400 < 14
           for: 1h

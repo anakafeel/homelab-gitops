@@ -5,6 +5,5 @@ resources:
   - namespace.yaml
   - deployment.yaml
   - service.yaml
-  - ingress.yaml
   - ingress-public.yaml
   - ingress-duckdns.yaml
