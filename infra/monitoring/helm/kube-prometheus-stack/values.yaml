@@ -144,6 +144,12 @@ prometheus-node-exporter:
       memory: 96Mi
 
 grafana:
+  # The chart's default -distroless build crashes on the Pi at startup
+  # (SIGBUS / "traceback did not unwind" in the Go runtime, under both k3s and
+  # Docker, on fresh pulls). The regular build of the same version runs fine.
+  image:
+    repository: grafana/grafana
+    tag: 13.2.4
   # Login comes from the SOPS-encrypted Secret in infra/monitoring
   # (the chart's built-in default password is public knowledge).
   admin:
