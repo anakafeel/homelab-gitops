@@ -11,6 +11,11 @@ configs:
   params:
     # TLS ends at the ingress / Tailscale proxy, not at argocd-server.
     server.insecure: true
+    # Sync one app at a time (default 10). A burst of 9 merges on 2026-10-23 synced
+    # in parallel, overloaded k3s's sqlite datastore and crashed k3s.
+    controller.operation.processors: "1"
+    controller.status.processors: "5"
+    controller.kubectl.parallelism.limit: "5"
   cm:
     # How often Argo CD re-checks git; default is 120s, fine either way on a Pi.
     timeout.reconciliation: 180s
