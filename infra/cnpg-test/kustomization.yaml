@@ -10,5 +10,6 @@ resources:
   - objectstore.yaml
   - cluster.yaml
   - scheduledbackup.yaml
+  - restore.yaml # drill only
 generators:
   - ksops-generator.yaml # -> Secret garage-s3

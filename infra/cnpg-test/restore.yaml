@@ -1,0 +1,54 @@
+# Restore drill: a new cluster recovered from pg-test's backups in Garage, to a
+# point in time. Table `drill` had 1000 rows at the target and 1500 afterwards,
+# so a correct restore has exactly 1000. Delete this file once the drill passes.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: cnpg-restore-1
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes: ["ReadWriteOnce"]
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: cnpg-local
+  claimRef:
+    namespace: cnpg-test
+    name: pg-restore-1
+  local:
+    path: /mnt/cnpg-data/restore
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values: ["anakafeel-pi"]
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: pg-restore
+spec:
+  instances: 1
+  storage:
+    storageClass: cnpg-local
+    size: 2Gi
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      memory: 512Mi
+  bootstrap:
+    recovery:
+      source: pg-test
+      recoveryTarget:
+        targetTime: "2026-10-23 23:22:01.069605+00"
+  # No WAL archiver here: the restored cluster must not write into pg-test's backup path.
+  externalClusters:
+    - name: pg-test
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: garage
+          serverName: pg-test
