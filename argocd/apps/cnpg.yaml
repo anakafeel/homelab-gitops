@@ -1,0 +1,40 @@
+# CloudNativePG operator (Phase 6). It manages Postgres clusters declared as
+# `Cluster` resources; the Immich database will be one of them.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cnpg
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://cloudnative-pg.github.io/charts
+    chart: cloudnative-pg
+    targetRevision: 0.29.1
+    helm:
+      valuesObject:
+        crds:
+          create: true
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            memory: 256Mi
+        monitoring:
+          podMonitorEnabled: true
+          grafanaDashboard:
+            create: true
+            namespace: monitoring # where the Grafana sidecar looks
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cnpg-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true # CNPG CRDs are too big for client-side apply
