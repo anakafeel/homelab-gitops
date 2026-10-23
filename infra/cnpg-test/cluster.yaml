@@ -17,6 +17,7 @@ spec:
     enablePodMonitor: true
   plugins:
     - name: barman-cloud.cloudnative-pg.io
+      enabled: true # the webhook adds it; without it Argo CD shows OutOfSync
       isWALArchiver: true
       parameters:
         barmanObjectName: garage
