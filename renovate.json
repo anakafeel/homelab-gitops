@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Renovate opens update PRs only. Nothing automerges: every update is merged by hand after the validate check passes.",
+  "description": "Renovate opens update PRs. Minor, patch and digest updates merge themselves once the validate check passes; majors and the hand-installed Argo CD chart wait for a manual merge.",
   "extends": [
     "config:recommended",
     ":dependencyDashboard"
@@ -40,6 +40,24 @@
   ],
   "packageRules": [
     {
+      "description": "Minor, patch and digest updates merge themselves through GitHub auto-merge once the required validate check passes.",
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest",
+        "pin",
+        "pinDigest"
+      ],
+      "automerge": true
+    },
+    {
+      "description": "Merging the Argo CD chart bump does not deploy it (helm upgrade by hand), so it stays a manual merge as a reminder.",
+      "matchDepNames": [
+        "argo-cd"
+      ],
+      "automerge": false
+    },
+    {
       "description": "Portfolio CI pins its own digest right after each build (auto-merging PR from anakafeel/portfolio-website), so Renovate leaves this image alone.",
       "matchPackageNames": [
         "docker.io/anakafeel/nextjs-portfolio",
@@ -58,5 +76,6 @@
       ],
       "enabled": false
     }
-  ]
+  ],
+  "platformAutomerge": true
 }
