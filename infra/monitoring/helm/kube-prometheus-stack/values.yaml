@@ -190,4 +190,5 @@ grafana:
       cpu: 25m
       memory: 128Mi
     limits:
-      memory: 384Mi
+      # 384Mi left Grafana 13 at ~379Mi in steady state (2026-10-23).
+      memory: 512Mi
