@@ -1,0 +1,14 @@
+# Throwaway CNPG cluster for the Phase 6 backup and restore drill, before
+# Immich's database moves onto CNPG. Data lives in a 20G ext4 loop image on the
+# HDD (/mnt/cnpg-data, see the vault Phase 6 log); backups go to Garage.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: cnpg-test
+resources:
+  - namespace.yaml
+  - storage.yaml
+  - objectstore.yaml
+  - cluster.yaml
+  - scheduledbackup.yaml
+generators:
+  - ksops-generator.yaml # -> Secret garage-s3

@@ -24,3 +24,10 @@ spec:
               kubernetes.io/metadata.name: tailscale
       ports:
         - port: s3
+    # CNPG Postgres pods: barman-cloud base backups and WAL archive.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: cnpg-test
+      ports:
+        - port: s3

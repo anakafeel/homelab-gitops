@@ -41,6 +41,33 @@ resource "garage_bucket_permission" "tofu_ci_state" {
   owner         = false
 }
 
+# CNPG base backups and WAL archive (barman-cloud plugin).
+resource "garage_bucket" "cnpg_backups" {
+  global_alias = "cnpg-backups"
+  max_size     = 10737418240 # 10 GiB
+}
+
+resource "garage_key" "cnpg" {
+  name = "cnpg"
+}
+
+resource "garage_bucket_permission" "cnpg_backups" {
+  bucket_id     = garage_bucket.cnpg_backups.id
+  access_key_id = garage_key.cnpg.id
+  read          = true
+  write         = true
+  owner         = false
+}
+
+output "cnpg_access_key_id" {
+  value = garage_key.cnpg.id
+}
+
+output "cnpg_secret_access_key" {
+  value     = garage_key.cnpg.secret_access_key
+  sensitive = true
+}
+
 output "tofu_ci_access_key_id" {
   value = garage_key.tofu_ci.id
 }
