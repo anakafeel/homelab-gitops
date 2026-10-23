@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: n8n-env
+    namespace: n8n
+stringData:
+    VAULTPI_QUARANTINE_TOKEN: ENC[AES256_GCM,data:hdmCzPR+bzQBYwDoKgapL7v2JOA6o6webeEiBSNxxh8LVaCMb5cLspSQSQ==,iv:a61fbWxD4eUKvQQsPd9SsbFTy8sv3I4W6kWG0x3oCUE=,tag:iLy9COhbLFbS4CgJRvCjBw==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBYWDNwelRNc0pkTmhiV0di
+            S3BzSTFSZGVmMVNEUzRDQURKWHFGRG1UMEdzCk5qY01BTkV3eXFHWFZDbnpWeHFD
+            bEhpdFREc3dGdC9sSUV1bVRwUXcxUTQKLS0tIE1WUmFkUC9FQ2F3QWFHWE11UnlX
+            bko0OGo2dFVrSGwybFpmanFicXJDUFEKf1DGHVdXlGbRyJv7eKTggs76EWw9Juf/
+            rnmB2eRxGPvajjKivQdNU5JLKpLdryS4lW3btjjaTA5OmennNOQ/mQ==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xefqhzrwz3z9pdekd648szd94q9fl3nc025cyxlgnf6gdq5zyces6jc4zm
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-19T03:44:53Z"
+    mac: ENC[AES256_GCM,data:pyF5sRI7Y5UR2IWyMqQsuLqpCiPM8W+L7v+G2andPUOIDDn1XEPR3Za11ymIbLi1ZgNDb97V7gLAa0HI+hj0noG/iAg0V3oPXhmt6sfNnh338r5B3cDo1W1/cGOtOTefFk6GiTFdFKngTWIvXVciAq9U3aBM7IDCnIwEFACRJIg=,iv:4m5azQrzVUhEvhgClpWVRxC/b30G07IT3xM7P/HLtSE=,tag:48gvKBGxrXIOunm7w7VsGw==,type:str]
+    version: 3.13.3

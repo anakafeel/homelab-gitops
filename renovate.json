@@ -1,21 +1,34 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "description": "Renovate opens update PRs only. Nothing automerges: every update is merged by hand after the validate check passes.",
-  "extends": ["config:recommended", ":dependencyDashboard"],
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard"
+  ],
   "automerge": false,
   "prConcurrentLimit": 5,
-  "labels": ["dependencies"],
+  "labels": [
+    "dependencies"
+  ],
   "argocd": {
-    "managerFilePatterns": ["/^argocd/.+\\.yaml$/", "/^bootstrap/.+\\.yaml$/"]
+    "managerFilePatterns": [
+      "/^argocd/.+\\.yaml$/",
+      "/^bootstrap/.+\\.yaml$/"
+    ]
   },
   "kubernetes": {
-    "managerFilePatterns": ["/^apps/.+\\.yaml$/", "/^infra/.+\\.yaml$/"]
+    "managerFilePatterns": [
+      "/^apps/.+\\.yaml$/",
+      "/^infra/.+\\.yaml$/"
+    ]
   },
   "customManagers": [
     {
       "description": "Argo CD Helm chart version. It is installed by hand with helm, so merging this PR does not deploy it: run the helm upgrade in infra/argocd/values.yaml afterwards.",
       "customType": "regex",
-      "managerFilePatterns": ["/^infra/argocd/values\\.yaml$/"],
+      "managerFilePatterns": [
+        "/^infra/argocd/values\\.yaml$/"
+      ],
       "matchStrings": [
         "argo/argo-cd (?<currentValue>\\d+\\.\\d+\\.\\d+)",
         "--version (?<currentValue>\\d+\\.\\d+\\.\\d+)"
@@ -28,7 +41,21 @@
   "packageRules": [
     {
       "description": "Portfolio CI pins its own digest right after each build (auto-merging PR from anakafeel/portfolio-website), so Renovate leaves this image alone.",
-      "matchPackageNames": ["docker.io/anakafeel/nextjs-portfolio", "anakafeel/nextjs-portfolio"],
+      "matchPackageNames": [
+        "docker.io/anakafeel/nextjs-portfolio",
+        "anakafeel/nextjs-portfolio"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "n8n is pinned to 1.106.3: newer releases SIGBUS-crash on the Pi (see images/n8n/Dockerfile). Retest by hand before any bump.",
+      "matchFileNames": [
+        "images/n8n/**"
+      ],
+      "matchPackageNames": [
+        "n8nio/n8n",
+        "docker.io/n8nio/n8n"
+      ],
       "enabled": false
     }
   ]
