@@ -22,7 +22,7 @@ env:
 
 jobs:
   n8n:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     env:
       IMAGE: ghcr.io/anakafeel/n8n-vaultpi
       TAG: "1.106.3" # keep in step with images/n8n/Dockerfile's FROM
