@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Renovate opens update PRs. Minor, patch and digest updates merge themselves once the validate check passes; majors and the hand-installed Argo CD chart wait for a manual merge.",
+  "description": "Renovate opens update PRs and every one merges itself once the validate check passes, majors included. Only the hand-installed Argo CD chart waits for a manual merge.",
   "extends": [
     "config:recommended",
     ":dependencyDashboard"
@@ -40,8 +40,9 @@
   ],
   "packageRules": [
     {
-      "description": "Minor, patch and digest updates merge themselves through GitHub auto-merge once the required validate check passes.",
+      "description": "Every update, majors included, merges itself through GitHub auto-merge once the required validate check passes.",
       "matchUpdateTypes": [
+        "major",
         "minor",
         "patch",
         "digest",
