@@ -85,6 +85,9 @@ spec:
               mountPath: /home/node/.n8n
             - name: tmp
               mountPath: /tmp
+            # n8n writes static assets to ~/.cache on start; the root filesystem is read-only.
+            - name: cache
+              mountPath: /home/node/.cache
             # Photo-search scripts, read-only, at their host path.
             - name: vaultpi
               mountPath: /home/anakafeel/vaultpi
@@ -105,6 +108,9 @@ spec:
         - name: tmp
           emptyDir:
             sizeLimit: 512Mi
+        - name: cache
+          emptyDir:
+            sizeLimit: 256Mi
         - name: data
           hostPath:
             path: /mnt/docker-root/n8n
