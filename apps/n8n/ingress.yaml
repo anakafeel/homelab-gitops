@@ -1,0 +1,16 @@
+# Tailnet only: the Tailscale operator creates a proxy device "n8n" with a
+# Let's Encrypt cert -> https://n8n.<tailnet>.ts.net (same as Grafana/Argo CD).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: n8n
+spec:
+  ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: n8n
+      port:
+        number: 80
+  tls:
+    - hosts:
+        - n8n
