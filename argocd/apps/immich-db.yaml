@@ -1,0 +1,25 @@
+# Immich database on CNPG (infra/immich). Needs the cnpg operator (wave 1)
+# and the barman-cloud plugin (wave 2) first.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: immich-db
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/anakafeel/homelab-gitops.git
+    targetRevision: main
+    path: infra/immich
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: immich
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true # no decrypted copy in last-applied annotation
+      - SkipDryRunOnMissingResource=true # CRDs come from other apps

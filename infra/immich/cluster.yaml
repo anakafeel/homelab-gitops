@@ -1,0 +1,32 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: immich-db
+spec:
+  instances: 1
+  # PG14 + vchord 0.4.3, the same as the Docker DB, so its dump restores as is.
+  imageName: ghcr.io/tensorchord/cloudnative-vectorchord:14.18-0.4.3@sha256:049ca51724e1bfc1424f52331c35255f21bdc99e495c1d5f9e508a38fba711dc
+  postgresql:
+    shared_preload_libraries:
+      - vchord.so
+  bootstrap:
+    initdb:
+      database: immich
+      owner: immich
+  storage:
+    storageClass: cnpg-local
+    size: 5Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+  monitoring:
+    enablePodMonitor: true
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      enabled: true # the webhook adds it; without it Argo CD shows OutOfSync
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: garage

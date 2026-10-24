@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: garage-s3
+    namespace: immich
+type: Opaque
+stringData:
+    ACCESS_KEY_ID: ENC[AES256_GCM,data:HWuZ6voDxkGWrmQdwWIKiuEoTK38VSZ5DZY=,iv:wZhIndu9c5kncvH0nV1GPE3AfhF/U38HxVVdfQD1ftQ=,tag:Eaftvg7QQlqmDx9Py4uc1w==,type:str]
+    ACCESS_SECRET_KEY: ENC[AES256_GCM,data:gjUCD2dPB9aAFmbxRF5Jao7OkmpT8Fg1/mtmDqNPDhuGEx9Je02+KP3C39x/AkIQqssFOO/hjZqG/KzMw2XTVQ==,iv:wxUJ19Cr7efLHsHfo+sM6E86EnSRwceZqH4eHTCngtk=,tag:vVmYf+f749d6yH5e0d/fqw==,type:str]
+    REGION: ENC[AES256_GCM,data:xM1mxURP,iv:amucUGaO8Gaxdg1o7eL/LTZ+PUhEaM1SgnzFO1SXwE4=,tag:9G8DVktyyGuM3HFfPsvR4A==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB2R1Z6c1dwZnd0V0JMOXFJ
+            Y3ZPRUE4VkFWejBmR3FPRUFXN1BhcGZPOG44ClA3TXhObkRaUUQrZEhHbitNd0hp
+            dkpmdHpGMXJ5UUdWcWJvR0ZqREtIYjgKLS0tIGplaHErOUZsNVZSL2M1Q1lxd0E1
+            T3F1RWVLTll6bE54cXU3UWorNU1NbDgKNHol0zGQeyMLQYSruTaf7/jCxvVWNpGP
+            gCT/eHgHX6C4zZRYKUOWg0pGSeASD4OsZcgGS/mV9e9k7f91JhZdLw==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xefqhzrwz3z9pdekd648szd94q9fl3nc025cyxlgnf6gdq5zyces6jc4zm
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-24T21:49:05Z"
+    mac: ENC[AES256_GCM,data:bDkXWGQ9CwoeOThx0WqekmWcArlpdifWOzjYtTQ5rEQuHou0iVeSkbpJxT1FJ1SDS1o7MNOKJNBQGV13mj5yByuznfDCBqKoDZSlZ+VLhzaIL8C7JEmjEbaXB90YhFeUc1hLnK4Pg7KkmaH2t0LX+JHxbKEVV3RhHkBeJh4fKpQ=,iv:MAnwrLVeyAy4MrnEbMqQIPzNmZFAw9VYDNdSAX9aQoo=,tag:jow1uc6Qjv4Zf6xEB1O12A==,type:str]
+    version: 3.13.3
