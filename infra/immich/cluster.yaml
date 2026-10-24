@@ -13,6 +13,17 @@ spec:
     initdb:
       database: immich
       owner: immich
+  managed:
+    roles:
+      # Immich creates and updates the vchord extension at startup, which needs
+      # superuser (the Docker immich role was one too). The other fields are the
+      # webhook's defaults, written out so Argo CD doesn't show OutOfSync.
+      - name: immich
+        ensure: present
+        login: true
+        superuser: true
+        inherit: true
+        connectionLimit: -1
   storage:
     storageClass: cnpg-local
     size: 5Gi
