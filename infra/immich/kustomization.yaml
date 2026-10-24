@@ -1,0 +1,15 @@
+# Immich's database on CNPG (Phase 6). The Immich app itself is a separate Argo
+# CD app that comes after the DB is restored from the Docker dump, so the server
+# never starts against an empty DB. Data lives in the HDD loop image
+# /mnt/cnpg-data (dir immich/, uid 26); backups go to Garage.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: immich
+resources:
+  - namespace.yaml
+  - storage.yaml
+  - objectstore.yaml
+  - cluster.yaml
+  - scheduledbackup.yaml
+generators:
+  - ksops-generator.yaml # -> Secret garage-s3

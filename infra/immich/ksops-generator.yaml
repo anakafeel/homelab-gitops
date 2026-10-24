@@ -1,0 +1,11 @@
+# Decrypts the Garage S3 key for the cnpg-backups bucket (made in tofu/bootstrap).
+apiVersion: viaduct.ai/v1
+kind: ksops
+metadata:
+  name: garage-s3
+  annotations:
+    config.kubernetes.io/function: |
+      exec:
+        path: ksops
+files:
+  - ./garage-s3.sops.yaml

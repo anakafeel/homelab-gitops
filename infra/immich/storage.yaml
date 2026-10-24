@@ -1,0 +1,24 @@
+# Static local PV, pre-bound to the PVC CNPG creates for instance 1.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: immich-db-1
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes: ["ReadWriteOnce"]
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: cnpg-local
+  claimRef:
+    namespace: immich
+    name: immich-db-1
+  local:
+    # Loop image mountpoint is chattr +i: unmounted means write errors, not a full SD card.
+    path: /mnt/cnpg-data/immich
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values: ["anakafeel-pi"]

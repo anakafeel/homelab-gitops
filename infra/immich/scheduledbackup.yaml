@@ -1,0 +1,13 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: immich-db-daily
+spec:
+  schedule: "0 30 3 * * *" # 03:30 UTC, after pg-test (six fields: seconds first)
+  backupOwnerReference: self
+  immediate: true # first backup as soon as the cluster is up
+  cluster:
+    name: immich-db
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
