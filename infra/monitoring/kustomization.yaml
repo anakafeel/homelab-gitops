@@ -11,7 +11,7 @@ resources:
   - rules.yaml
   - scrape-docker-cadvisor.yaml
 generators:
-  - ksops-generator.yaml # -> Secrets grafana-admin, alertmanager-discord, grafana-cloudwatch, alertmanager-healthchecks
+  - ksops-generator.yaml # -> Secrets grafana-admin, alertmanager-discord, alertmanager-healthchecks
 # Dashboards as ConfigMaps; the Grafana sidecar loads any ConfigMap labelled grafana_dashboard=1.
 configMapGenerator:
   - name: dashboard-vaultpi-overview
