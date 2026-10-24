@@ -1,0 +1,31 @@
+# Immich server (chart from its OCI registry) with values from this repo. Its
+# database, library volume and ingress live in infra/immich (app immich-db).
+# Merge only after the Docker DB dump is restored into immich-db, or the server
+# runs fresh migrations on an empty database.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: immich
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+spec:
+  project: default
+  sources:
+    - repoURL: ghcr.io/immich-app/immich-charts
+      chart: immich
+      targetRevision: 0.13.4
+      helm:
+        releaseName: immich
+        valueFiles:
+          - $values/infra/immich/helm/immich/values.yaml
+    - repoURL: https://github.com/anakafeel/homelab-gitops.git
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: immich
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

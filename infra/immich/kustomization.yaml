@@ -11,5 +11,7 @@ resources:
   - objectstore.yaml
   - cluster.yaml
   - scheduledbackup.yaml
+  - library.yaml
+  - ingress.yaml
 generators:
   - ksops-generator.yaml # -> Secret garage-s3

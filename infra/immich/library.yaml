@@ -1,0 +1,37 @@
+# Immich's own library (uploads, thumbnails, encoded video) on the HDD, the same
+# directory Docker used. Retain: deleting the PVC must never touch the photos.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: immich-library
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes: ["ReadWriteOnce"]
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: immich-library
+  claimRef:
+    namespace: immich
+    name: immich-library
+  hostPath:
+    path: /mnt/vaultpi-hdd/immich/library
+    type: Directory
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values: ["anakafeel-pi"]
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-library
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: immich-library
+  volumeName: immich-library
+  resources:
+    requests:
+      storage: 100Gi

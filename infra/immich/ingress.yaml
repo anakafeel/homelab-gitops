@@ -1,0 +1,17 @@
+# Immich on the tailnet only: the Tailscale operator creates a proxy device
+# "immich" with a Let's Encrypt cert -> https://immich.<tailnet>.ts.net
+# (same pattern as infra/monitoring/grafana-ingress.yaml).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: immich
+spec:
+  ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: immich-server
+      port:
+        number: 2283
+  tls:
+    - hosts:
+        - immich

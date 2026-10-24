@@ -1,0 +1,11 @@
+# Decrypts the Argo CD repository entry for the Immich OCI chart.
+apiVersion: viaduct.ai/v1
+kind: ksops
+metadata:
+  name: argocd-repos
+  annotations:
+    config.kubernetes.io/function: |
+      exec:
+        path: ksops
+files:
+  - ./repo-immich-charts.sops.yaml
