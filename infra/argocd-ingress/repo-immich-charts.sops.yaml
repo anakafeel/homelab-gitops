@@ -1,0 +1,29 @@
+# Argo CD repository entry for the Immich chart, which is only published as an
+# OCI artifact on ghcr.io. Public, so no credentials: nothing here is secret.
+apiVersion: v1
+kind: Secret
+metadata:
+    name: repo-immich-charts
+    namespace: argocd
+    labels:
+        argocd.argoproj.io/secret-type: repository
+stringData:
+    type: ENC[AES256_GCM,data:JTDSSQ==,iv:i38d3n7l2eW+ma9KvZaIKH/3gp+R7A7dZIX9YVQndLo=,tag:YNupXqknnbMFKQFkGJuG+w==,type:str]
+    name: ENC[AES256_GCM,data:Z3SEOrmssxJwg0Teaw==,iv:GHM8WhNoRpu5kFyFQKCJqRSzXICEWQXIsn3q+WpCVCg=,tag:vCtr/xz/qHHVJvEbONApjg==,type:str]
+    url: ENC[AES256_GCM,data:GzPUIMCeFtsQ4197Q2KzcJPvxeVWbLE8rXuhovbdtwk=,iv:pS+RJk5ny1SFtkD0RbBnE9NJ2A4UBFnAaIPzQuWey00=,tag:y0cN8A0QDv0bcg0xr/IMvQ==,type:str]
+    enableOCI: ENC[AES256_GCM,data:eqWDxQ==,iv:iDyRrS4wGZcVxxZqw208hkckBaIL2e3wfFAJVFGDAp8=,tag:ZWHe1T2JTqd9LedeRH3pLQ==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAwWWxGWlBWdWdFSnNTb1M0
+            SmpZUnRUOUc5MEw0WmFrMjgwSFY1MTFTVFZjCnZMbFFRTmptaHBFNDFsZHJLV1hL
+            eGNGWHFQUGVCMkh2SjV5bkhwMjcxVDgKLS0tIGtoSjhVb0MzYmw2VS9CVW1lQXlH
+            MUhqbG9FOGpDZ1pkM0lyLzVVNjBlb00KCdcLHxpywL6ILVlvgvB/d4avngna79u5
+            Dct6LRLSAVmJvYEJyE2DNNBEpBuq1wI4SYb/htjseJ/5/tVnkcMyBQ==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xefqhzrwz3z9pdekd648szd94q9fl3nc025cyxlgnf6gdq5zyces6jc4zm
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-24T22:12:29Z"
+    mac: ENC[AES256_GCM,data:SlxxBEylCuSYIlDxFUlG0Md0fKzAgGaj8OyDl9XD4rQoI5IkpXr6sJ3vyBkwB6+RUj1y1mC3+FkzQMGrTGybL0WyT63a706M5a8NNTrlolfgghKla9Ls+36M+zupZ/B19Hr5oXDR+VpIWfh6+4vvo9q3fwN/5mhtFCxHw7Ki/kU=,iv:IjvhJDtpft2BpdLevU5No9SNDDSi3lY5YQPKKDxqkHo=,tag:lBQyIdpnVfOMgQsotpph3A==,type:str]
+    version: 3.13.3

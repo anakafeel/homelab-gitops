@@ -1,0 +1,108 @@
+# Values for the immich chart (argocd/apps/immich.yaml). The chart is
+# bjw-s app-template underneath, so controllers/persistence follow its schema.
+immich:
+  persistence:
+    library:
+      existingClaim: immich-library # infra/immich/library.yaml
+
+# In-cluster Valkey for the job queue; it holds nothing worth keeping.
+valkey:
+  enabled: true
+
+server:
+  enabled: true
+  controllers:
+    main:
+      containers:
+        main:
+          image:
+            # Never lower than the version that last ran on the DB (migrations
+            # only go forward). Docker ran v3.2.4 before the move.
+            tag: v3.2.4
+          env:
+            REDIS_HOSTNAME: '{{ printf "%s-valkey" .Release.Name }}'
+            # CNPG writes the full connection string into this Secret.
+            DB_URL:
+              valueFrom:
+                secretKeyRef:
+                  name: immich-db-app
+                  key: uri
+  persistence:
+    # External libraries, read-only like in Docker. Mount paths must match the
+    # library import paths stored in the DB (/external/<name>).
+    ext-camera:
+      type: hostPath
+      hostPath: "/mnt/vaultpi-hdd/camera"
+      globalMounts:
+        - path: "/external/camera"
+          readOnly: true
+    ext-dslr:
+      type: hostPath
+      hostPath: "/mnt/vaultpi-hdd/DSLR"
+      globalMounts:
+        - path: "/external/DSLR"
+          readOnly: true
+    ext-gitworkshop-pics:
+      type: hostPath
+      hostPath: "/mnt/vaultpi-hdd/gitworkshop pics"
+      globalMounts:
+        - path: "/external/gitworkshop pics"
+          readOnly: true
+    ext-irum-marriage-party-2002:
+      type: hostPath
+      hostPath: "/mnt/vaultpi-hdd/IRUM MARRIAGE PARTY-2002"
+      globalMounts:
+        - path: "/external/IRUM MARRIAGE PARTY-2002"
+          readOnly: true
+    ext-my-pictures:
+      type: hostPath
+      hostPath: "/mnt/vaultpi-hdd/My Pictures"
+      globalMounts:
+        - path: "/external/My Pictures"
+          readOnly: true
+    ext-note-8-dcim:
+      type: hostPath
+      hostPath: "/mnt/vaultpi-hdd/note 8 dcim"
+      globalMounts:
+        - path: "/external/note 8 dcim"
+          readOnly: true
+    ext-onedrive-pictures:
+      type: hostPath
+      hostPath: "/mnt/vaultpi-hdd/OneDrive/Pictures"
+      globalMounts:
+        - path: "/external/OneDrive/Pictures"
+          readOnly: true
+    ext-saim-iphone-dcim-2020-2021:
+      type: hostPath
+      hostPath: "/mnt/vaultpi-hdd/Saim iphone DCIM (2020-2021)"
+      globalMounts:
+        - path: "/external/Saim iphone DCIM (2020-2021)"
+          readOnly: true
+    ext-saim-iphone-dcim-2021-2023-march:
+      type: hostPath
+      hostPath: "/mnt/vaultpi-hdd/Saim iphone DCIM (2021-2023 march)"
+      globalMounts:
+        - path: "/external/Saim iphone DCIM (2021-2023 march)"
+          readOnly: true
+    ext-saim-personal-files-my-pictures:
+      type: hostPath
+      hostPath: "/mnt/vaultpi-hdd/SAIM PERSONAL FILES/My Pictures"
+      globalMounts:
+        - path: "/external/SAIM PERSONAL FILES/My Pictures"
+          readOnly: true
+    ext-saim-phone-dcim-2026-may:
+      type: hostPath
+      hostPath: "/mnt/vaultpi-hdd/Saim Phone DCIM (2026 MAY)"
+      globalMounts:
+        - path: "/external/Saim Phone DCIM (2026 MAY)"
+          readOnly: true
+    ext-zzz:
+      type: hostPath
+      hostPath: "/mnt/vaultpi-hdd/zzz"
+      globalMounts:
+        - path: "/external/zzz"
+          readOnly: true
+
+# Off on the Pi (RAM); also disabled in Immich's own settings, stored in the DB.
+machine-learning:
+  enabled: false
