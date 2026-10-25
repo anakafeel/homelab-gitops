@@ -156,6 +156,21 @@ grafana:
     existingSecret: grafana-admin
     userKey: admin-user
     passwordKey: admin-password
+  # Umami's visit data (apps/umami) as a Postgres datasource, read-only role.
+  # The password comes from the SOPS Secret grafana-umami as an env var.
+  envFromSecret: grafana-umami
+  additionalDataSources:
+    - name: Umami
+      uid: umami
+      type: grafana-postgresql-datasource
+      url: umami-db-r.umami.svc:5432
+      user: grafana_ro
+      jsonData:
+        database: umami
+        sslmode: require
+        postgresVersion: 1800
+      secureJsonData:
+        password: $UMAMI_DB_PASSWORD
   # Exposed via infra/monitoring/grafana-ingress.yaml (Tailscale) instead.
   ingress:
     enabled: false

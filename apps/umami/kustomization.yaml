@@ -10,4 +10,4 @@ resources:
   - ingress.yaml
   - ingress-public.yaml
 generators:
-  - ksops-generator.yaml # -> Secret umami-env (APP_SECRET)
+  - ksops-generator.yaml # -> Secrets umami-env (APP_SECRET), grafana-ro (DB role)

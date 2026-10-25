@@ -1,4 +1,5 @@
-# Decrypts umami-env.sops.yaml (APP_SECRET, signs login tokens).
+# Decrypts umami-env.sops.yaml (APP_SECRET, signs login tokens) and
+# grafana-ro.sops.yaml (password of the read-only DB role Grafana uses).
 apiVersion: viaduct.ai/v1
 kind: ksops
 metadata:
@@ -9,3 +10,4 @@ metadata:
         path: ksops
 files:
   - ./umami-env.sops.yaml
+  - ./grafana-ro.sops.yaml

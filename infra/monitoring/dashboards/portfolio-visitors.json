@@ -1,0 +1,362 @@
+{
+  "title": "Portfolio visitors",
+  "uid": "portfolio-visitors",
+  "tags": [
+    "umami",
+    "portfolio"
+  ],
+  "description": "saimhashmi.is-a.dev visits from Umami (apps/umami). The full Umami UI is at https://umami.tail15e8c8.ts.net.",
+  "timezone": "browser",
+  "refresh": "5m",
+  "schemaVersion": 39,
+  "editable": true,
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Visitors",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "umami"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "umami"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT count(DISTINCT e.session_id) FROM website_event e WHERE event_type = 1 AND $__timeFilter(e.created_at)"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Visits",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "umami"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "umami"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT count(DISTINCT e.visit_id) FROM website_event e WHERE event_type = 1 AND $__timeFilter(e.created_at)"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Page views",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "umami"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "umami"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT count(*) FROM website_event e WHERE event_type = 1 AND $__timeFilter(e.created_at)"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Countries",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "umami"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "umami"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT count(DISTINCT s.country) FROM website_event e JOIN session s USING (session_id) WHERE event_type = 1 AND $__timeFilter(e.created_at)"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Page views and visitors",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "umami"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 60,
+            "lineWidth": 1
+          },
+          "unit": "short",
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "umami"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT $__timeGroupAlias(e.created_at, $__interval), count(*) AS \"page views\", count(DISTINCT e.session_id) AS visitors FROM website_event e WHERE event_type = 1 AND $__timeFilter(e.created_at) GROUP BY 1 ORDER BY 1"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "table",
+      "title": "Recent page views",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "umami"
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 12
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "umami"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT e.created_at AS \"time\", e.url_path AS page, coalesce(nullif(e.referrer_domain, ''), 'direct') AS referrer, s.country, s.region, s.city, s.device, s.browser, s.os, left(e.session_id::text, 8) AS visitor FROM website_event e JOIN session s USING (session_id) WHERE event_type = 1 AND $__timeFilter(e.created_at) ORDER BY e.created_at DESC LIMIT 200"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "table",
+      "title": "Top pages",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "umami"
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 0,
+        "y": 24
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "umami"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT e.url_path AS page, count(*) AS views, count(DISTINCT e.session_id) AS visitors FROM website_event e WHERE event_type = 1 AND $__timeFilter(e.created_at) GROUP BY 1 ORDER BY 2 DESC LIMIT 20"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "table",
+      "title": "Referrers",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "umami"
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 8,
+        "y": 24
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "umami"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT coalesce(nullif(e.referrer_domain, ''), 'direct') AS referrer, count(DISTINCT e.visit_id) AS visits FROM website_event e WHERE event_type = 1 AND $__timeFilter(e.created_at) GROUP BY 1 ORDER BY 2 DESC LIMIT 20"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "table",
+      "title": "Countries",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "umami"
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 16,
+        "y": 24
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "umami"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT coalesce(s.country, '?') AS country, count(DISTINCT e.session_id) AS visitors FROM website_event e JOIN session s USING (session_id) WHERE event_type = 1 AND $__timeFilter(e.created_at) GROUP BY 1 ORDER BY 2 DESC LIMIT 20"
+        }
+      ]
+    }
+  ],
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  }
+}

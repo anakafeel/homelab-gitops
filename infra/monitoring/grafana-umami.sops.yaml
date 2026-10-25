@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: grafana-umami
+type: Opaque
+stringData:
+    UMAMI_DB_PASSWORD: ENC[AES256_GCM,data:e+KnWXKh3nklOQpr8VzJAj6Yc4i5hKGVSCD8RMKfUpqlolruYhSZ1iN+vBt9+Ztu,iv:kgcRwXFt1rn3Sy30Mkwx25avvEinANynFe5/YTZtyFk=,tag:aHee1uE/CxhPGaVCpqmOIQ==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA2SVFIZWU4QkUvbzJWemZ6
+            bndmcGVYNzBvN0JUc1NHYjJISkRFQlB6V0NNCm5GZlJFbXFpbDZTcDBXUk8zQjg3
+            OXFFTk9aUXdlWTJDRDlaeVNyajVwaHcKLS0tICtLY2tGRWEwTk1QTmxXWE1WWnVS
+            bHhlVDNrT0RjUUJ4bjREWStoWHNqYm8KuBuQOGeAipeo5Str9FuQwHgS5UWvvubI
+            MS8fpZmjpG3kiU2cZrHt7G0X/A/Y5fq4cPAVdxUQ8QAvBdfPtDdoQw==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xefqhzrwz3z9pdekd648szd94q9fl3nc025cyxlgnf6gdq5zyces6jc4zm
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-25T20:35:51Z"
+    mac: ENC[AES256_GCM,data:fYtYSNGg9CfGDL8SrORW9GMPtvEWtFDpy4vA37mUNzF7uErekXM+HNLZfx4be9egEtV1MB4FHtY418NQheDbqX7jrbvgTKgHkGTOTi8vUZUG6UehN9FwYaaNZauH2IkyNiRRL+6ROr1Y8J6rlZxKG8CEjnQApMkzv8tEpy0zv3w=,iv:Erb5pn4/Hu0qI/XPbu8igmGk9dg4i3b8BSnSLfxC5Cw=,tag:32SxKtsw23mBkyEaj4/BBA==,type:str]
+    version: 3.13.3
