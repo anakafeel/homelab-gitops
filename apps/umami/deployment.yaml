@@ -1,0 +1,78 @@
+# Umami web analytics for saimhashmi.is-a.dev. The dashboard is tailnet-only
+# (ingress.yaml); the public site reaches only the tracker script and the
+# collect endpoint (ingress-public.yaml).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: umami
+  labels:
+    app.kubernetes.io/name: umami
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: umami
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: umami
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001 # "nextjs" user baked into the image
+        runAsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: umami
+          image: ghcr.io/umami-software/umami:3.4.0@sha256:85909afc45bdcda1917394594a087421fdbb05610fded0fa9f6fb861abb2f367
+          ports:
+            - name: http
+              containerPort: 3000
+          envFrom:
+            - secretRef:
+                name: umami-env
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: umami-db-app # created by CNPG
+                  key: uri
+            # Served as /insights.js instead of /script.js (fewer ad-blocker hits).
+            - name: TRACKER_SCRIPT_NAME
+              value: insights.js
+            - name: DISABLE_TELEMETRY
+              value: "1"
+            - name: NODE_OPTIONS
+              value: --max-old-space-size=192
+          securityContext:
+            allowPrivilegeEscalation: false
+            # shortcut: the start script and Next.js write inside /app; make it read-only once the write paths are known.
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop: ["ALL"]
+          startupProbe:
+            httpGet:
+              path: /api/heartbeat
+              port: http
+            periodSeconds: 5
+            failureThreshold: 36 # DB migrations on first start can be slow on the Pi
+          readinessProbe:
+            httpGet:
+              path: /api/heartbeat
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/heartbeat
+              port: http
+            periodSeconds: 30
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 25m
+              memory: 160Mi
+            limits:
+              memory: 320Mi

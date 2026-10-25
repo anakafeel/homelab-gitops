@@ -1,0 +1,15 @@
+# Dashboard, tailnet only: https://umami.<tailnet>.ts.net (same as Grafana/n8n).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: umami
+spec:
+  ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: umami
+      port:
+        number: 80
+  tls:
+    - hosts:
+        - umami

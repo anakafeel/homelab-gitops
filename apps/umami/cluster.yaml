@@ -1,0 +1,28 @@
+# Umami's database. Sized for the Pi: small buffers, few connections.
+# No backups yet: losing visit history is acceptable for now.
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: umami-db
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.6-system-trixie
+  postgresql:
+    parameters:
+      shared_buffers: 32MB
+      max_connections: "30"
+  bootstrap:
+    initdb:
+      database: umami
+      owner: umami
+  storage:
+    storageClass: cnpg-local
+    size: 2Gi
+  resources:
+    requests:
+      cpu: 50m
+      memory: 96Mi
+    limits:
+      memory: 256Mi
+  monitoring:
+    enablePodMonitor: true

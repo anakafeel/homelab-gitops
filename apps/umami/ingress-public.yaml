@@ -1,0 +1,35 @@
+# Only the tracker script and the collect endpoint are public, on the
+# portfolio's own host. Everything else on saimhashmi.is-a.dev still goes to
+# the portfolio (its "/" Prefix rule is shorter, so Traefik tries these first).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: umami-public
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - saimhashmi.is-a.dev
+      secretName: umami-tls
+  rules:
+    - host: saimhashmi.is-a.dev
+      http:
+        paths:
+          - path: /insights.js
+            pathType: Exact
+            backend:
+              service:
+                name: umami
+                port:
+                  name: http
+          - path: /api/send
+            pathType: Exact
+            backend:
+              service:
+                name: umami
+                port:
+                  name: http
