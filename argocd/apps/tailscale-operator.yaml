@@ -17,6 +17,8 @@ spec:
         # mounts the pre-created Secret operator-oauth (from tailscale-oauth app).
         operatorConfig:
           hostname: pi-k3s-operator # device name in the tailnet admin console
+        proxyConfig:
+          defaultProxyClass: default # infra/tailscale/proxyclass.yaml (MTU fix)
   destination:
     server: https://kubernetes.default.svc
     namespace: tailscale
