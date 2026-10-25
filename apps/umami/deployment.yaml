@@ -49,8 +49,7 @@ spec:
               value: --max-old-space-size=192
           securityContext:
             allowPrivilegeEscalation: false
-            # shortcut: the start script and Next.js write inside /app; make it read-only once the write paths are known.
-            readOnlyRootFilesystem: false
+            readOnlyRootFilesystem: true # tested: migrations + server start fine; /tmp for Next.js/Prisma scratch
             capabilities:
               drop: ["ALL"]
           startupProbe:
@@ -73,6 +72,13 @@ spec:
           resources:
             requests:
               cpu: 25m
-              memory: 160Mi
+              memory: 160Mi # ~136Mi idle in a test run
             limits:
               memory: 320Mi
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 128Mi
