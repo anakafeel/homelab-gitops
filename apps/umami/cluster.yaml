@@ -15,6 +15,20 @@ spec:
     initdb:
       database: umami
       owner: umami
+  managed:
+    roles:
+      # Read-only login for the Grafana datasource (infra/monitoring). The
+      # other fields are the webhook's defaults, written out so Argo CD
+      # doesn't show OutOfSync.
+      - name: grafana_ro
+        ensure: present
+        login: true
+        inherit: true
+        connectionLimit: -1
+        inRoles:
+          - pg_read_all_data
+        passwordSecret:
+          name: grafana-ro
   storage:
     storageClass: cnpg-local
     size: 2Gi
