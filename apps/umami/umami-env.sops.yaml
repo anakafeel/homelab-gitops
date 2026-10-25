@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: umami-env
+type: Opaque
+stringData:
+    APP_SECRET: ENC[AES256_GCM,data:fuHLG/0oNgT9P0ChOd+biw5CC4smTRNT7XiZTxMFTTFTYL1jgyxedlFkiptjo3cj7HBFTpxURzUC5yA2jIcC6g==,iv:4I+yBOsEVdUpgXJfNDxF5DJtAwE/N7MHS68gNbCmf8c=,tag:QDh0VpfkwQqBN7AvyMu/oQ==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB1MFlNSThFcXJiQkxBVElH
+            SERGcGpqMWhjTXIrY3JiY1NiTEhGczFGQTE0CnY3cGN4RUlWbXhLVHpVcEtYZE54
+            Wk1MdW5OT203WEVNQlhRbER0dEhpMjgKLS0tIGxVNVlCclVQMFZYYlI5V3U0Y29s
+            QXNlYmZUUzRMd0ROT0ttcnE1SUJEVE0KTwbWWCAt9Qs0vn36ub8o8EZMVFFvGcD5
+            ZiKwb88isZDlY/qBOMeQFI0Jjnl03ceu3WsYWZdbtJrukUcPFuH3nQ==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xefqhzrwz3z9pdekd648szd94q9fl3nc025cyxlgnf6gdq5zyces6jc4zm
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-25T20:07:26Z"
+    mac: ENC[AES256_GCM,data:xJv/IS63CdjgunZEtxppchIq8usaKX6dpPA4YUU5EoAaNIYpluVDbD/k4F0UACXQBrskFsBkm3lBlu8+0RhnZH7UVmyxemgAXmfm6XE3NvQ7XKYa1sKB2VXt3JKSylQUdZPTibhofwXhqBTUZ/qhwUatjlSm3tGfTTrfknGv10M=,iv:Ju4KSXaU9nVZS7PKJuCAMopBzAAXKum/1WKa0jXePfg=,tag:fSoqMWGcG8BBb996P+kKcw==,type:str]
+    version: 3.13.3

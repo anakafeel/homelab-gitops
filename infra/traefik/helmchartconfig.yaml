@@ -1,0 +1,14 @@
+# Overrides for k3s's bundled Traefik chart (k3s's helm-controller merges these).
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    service:
+      spec:
+        # Keep visitors' real IPs (X-Real-Ip/X-Forwarded-For) instead of the
+        # node's: Umami needs them for country and unique-visitor counts.
+        # Single node, so Local loses nothing.
+        externalTrafficPolicy: Local

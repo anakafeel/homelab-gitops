@@ -1,0 +1,11 @@
+# Decrypts umami-env.sops.yaml (APP_SECRET, signs login tokens).
+apiVersion: viaduct.ai/v1
+kind: ksops
+metadata:
+  name: umami-secrets
+  annotations:
+    config.kubernetes.io/function: |
+      exec:
+        path: ksops
+files:
+  - ./umami-env.sops.yaml
