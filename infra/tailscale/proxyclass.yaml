@@ -1,0 +1,21 @@
+# Default ProxyClass for every Tailscale Ingress/Service proxy (set as
+# proxyConfig.defaultProxyClass in argocd/apps/tailscale-operator.yaml).
+#
+# flannel runs over tailscale0 (k3s config: flannel-iface), so pods get
+# MTU 1230. A proxy's own WireGuard packets are its tailnet MTU (1280) + ~80
+# bytes, so large ones got dropped and ingress throughput sat at ~75 KB/s.
+# 1150 + 80 fits in 1230: ~2 MB/s after the change (2026-10-25).
+apiVersion: tailscale.com/v1alpha1
+kind: ProxyClass
+metadata:
+  name: default
+  annotations:
+    # The CRD comes with the operator chart (wave 1), after this app (wave 0).
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  statefulSet:
+    pod:
+      tailscaleContainer:
+        env:
+          - name: TS_DEBUG_MTU
+            value: "1150"

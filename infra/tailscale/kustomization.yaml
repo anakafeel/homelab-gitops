@@ -3,5 +3,6 @@ kind: Kustomization
 namespace: tailscale
 resources:
   - namespace.yaml
+  - proxyclass.yaml
 generators:
   - ksops-generator.yaml # -> Secret operator-oauth (client_id, client_secret)
