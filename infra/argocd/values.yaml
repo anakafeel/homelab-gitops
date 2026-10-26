@@ -1,7 +1,7 @@
 # Argo CD Helm values for a single-node Raspberry Pi 4 (8GB).
-# Chart: argo/argo-cd 10.11.1 (Argo CD v3.5.6)
+# Chart: argo/argo-cd 10.11.6 (Argo CD v3.5.6)
 # Install/upgrade:
-#   helm upgrade --install argocd argo/argo-cd --version 10.11.1 \
+#   helm upgrade --install argocd argo/argo-cd --version 10.11.6 \
 #     -n argocd --create-namespace -f infra/argocd/values.yaml
 
 global:
