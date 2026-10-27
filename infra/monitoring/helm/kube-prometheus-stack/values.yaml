@@ -149,7 +149,7 @@ grafana:
   # Docker, on fresh pulls). The regular build of the same version runs fine.
   image:
     repository: grafana/grafana
-    tag: 13.2.4
+    tag: 13.3.0
   # Login comes from the SOPS-encrypted Secret in infra/monitoring
   # (the chart's built-in default password is public knowledge).
   admin:
