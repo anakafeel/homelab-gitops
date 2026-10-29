@@ -1,6 +1,7 @@
-# Second public name, straight to the home IP (no CNAME): a working link for
-# is-a.dev's review and a fallback if is-a.dev is ever down. Same routing as
-# ingress-public.yaml; its own certificate so one name can't block the other.
+# Second public name, straight to the home IP (no CNAME). Every request 301s to
+# saimhashmi.is-a.dev so search engines see one host, not duplicate content.
+# Own certificate so https:// on this name still answers before redirecting.
+# To use it as a fallback while is-a.dev is down, drop the middleware annotations.
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -9,6 +10,7 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.middlewares: portfolio-duckdns-to-primary@kubernetescrd
 spec:
   ingressClassName: traefik
   tls:
@@ -33,7 +35,7 @@ metadata:
   name: portfolio-duckdns-redirect
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
-    traefik.ingress.kubernetes.io/router.middlewares: portfolio-https-redirect@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: portfolio-duckdns-to-primary@kubernetescrd
 spec:
   ingressClassName: traefik
   rules:
@@ -47,3 +49,15 @@ spec:
                 name: portfolio
                 port:
                   name: http
+---
+# Same path on the primary host. cert-manager's ACME solver Ingress has a longer
+# path, so renewals for this name still reach the solver, not the redirect.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: duckdns-to-primary
+spec:
+  redirectRegex:
+    regex: ^https?://anakafeel\.duckdns\.org/(.*)
+    replacement: https://saimhashmi.is-a.dev/${1}
+    permanent: true
