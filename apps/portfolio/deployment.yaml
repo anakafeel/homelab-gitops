@@ -26,7 +26,7 @@ spec:
       containers:
         - name: portfolio
           # Pinned by digest: same bytes as the Docker container. CI replaces this in Phase 3.
-          image: docker.io/anakafeel/nextjs-portfolio@sha256:c124513341c5a77865df67290b2fdbffe12808ae69cc99a1b7a8bb38d22c7cf5
+          image: docker.io/anakafeel/nextjs-portfolio@sha256:6b31c59ce5e2c203bcfcfcbf5333a20fb8558f499a8ac71b55568e706b77ae50
           ports:
             - name: http
               containerPort: 3000
