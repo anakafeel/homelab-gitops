@@ -90,12 +90,6 @@ server:
       globalMounts:
         - path: "/external/SAIM PERSONAL FILES/My Pictures"
           readOnly: true
-    ext-saim-phone-dcim-2026-may:
-      type: hostPath
-      hostPath: "/mnt/vaultpi-hdd/Saim Phone DCIM (2026 MAY)"
-      globalMounts:
-        - path: "/external/Saim Phone DCIM (2026 MAY)"
-          readOnly: true
     ext-zzz:
       type: hostPath
       hostPath: "/mnt/vaultpi-hdd/zzz"
