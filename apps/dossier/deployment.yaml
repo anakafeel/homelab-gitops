@@ -68,18 +68,23 @@ spec:
               path: /api/health
               port: http
             periodSeconds: 5
+            timeoutSeconds: 5
             failureThreshold: 60 # migrations + seed on first start are slow on the Pi
+          # 5s timeouts: under swap pressure the Pi answers slowly, and the 1s
+          # default had liveness restart the pod mid-request (2026-11-03).
           readinessProbe:
             httpGet:
               path: /api/health
               port: http
             periodSeconds: 10
+            timeoutSeconds: 5
           livenessProbe:
             httpGet:
               path: /api/health
               port: http
             periodSeconds: 30
-            failureThreshold: 3
+            timeoutSeconds: 5
+            failureThreshold: 5
           resources:
             requests:
               cpu: 50m
