@@ -57,8 +57,8 @@ jobs:
     runs-on: ubuntu-26.04-arm
     env:
       IMAGE: ghcr.io/anakafeel/dossier
-      TAG: "1.9.2"
-      REF: 5446f4cb117b0e4b4bbf26c6156c97406b0a4ff2 # AienTech/dossier v1.9.2
+      TAG: "1.11.0"
+      REF: 57097fcb980a65b336bbce334335cc980fb3b0da # AienTech/dossier v1.11.0
     steps:
       - name: Fetch upstream source
         run: |
