@@ -52,8 +52,6 @@ spec:
               value: https://generativelanguage.googleapis.com/v1beta/openai
             - name: DOSSIER_AI_MODEL
               value: gemini-flash-lite-latest
-            - name: DOSSIER_JOBS_SOURCE
-              value: freehire # no key; the job agent can search it
             - name: DOSSIER_TELEMETRY
               value: "off"
             - name: DOSSIER_PUBLIC_URL
