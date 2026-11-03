@@ -6,6 +6,7 @@ type: Opaque
 stringData:
     DOSSIER_SECRET: ENC[AES256_GCM,data:NPtN2KQRzBsAoP8NbsLDEYYZOqN8tOJi9bLUwsUCHWoI5kBeeBTI4ASkhUI=,iv:i+ubRqCwy9vb1B4ZHOqx+wV8ww4b9GGXZfACREjDZe8=,tag:/SzYZj0EEK2tNBUE1D58XA==,type:str]
     DOSSIER_PASSWORD: ENC[AES256_GCM,data:3XMrN+O0XvNth1640j4lo6bY9JTPrTnI68rOmnbTfQ5rcZfJ8v/X7+GDl405KPCh46Z+GL6dx+yVNNOU1Egba+O743Jon+VbzMlklFMK34OTr/h0FEm8coH1yg==,iv:ztkUpUkPsoTmUvIsUGu9HFb8KOCWRmOg3ATAdPzhK/w=,tag:m3Yb5IuB4KkvqQHCxpdVxA==,type:str]
+    DOSSIER_AI_KEY: ENC[AES256_GCM,data:rAm/XAhRIZABsQMQ3+qDga6r0jUtGOTjvcp5V4C0+GmxlMQBCMsNJN2qjZo+te5qKkqdRG0=,iv:LNdCUk0WjZWKaqWFUfsqUDh9WsvtEtQxQ6GCGRZjZm0=,tag:r4OqUvUc9ojEA7CXMaFqFg==,type:str]
 sops:
     age:
         - enc: |
@@ -18,6 +19,6 @@ sops:
             -----END AGE ENCRYPTED FILE-----
           recipient: age1xefqhzrwz3z9pdekd648szd94q9fl3nc025cyxlgnf6gdq5zyces6jc4zm
     encrypted_regex: ^(data|stringData)$
-    lastmodified: "2026-11-03T02:18:24Z"
-    mac: ENC[AES256_GCM,data:zGPptV4Ed/ctarnP0d4SLgIX+OU+oN2aw83clSyXGal6hpYzgt0YAliaFCFKpLADjmO2Avb3j+lvw2WK7Cq3ASFcfpei9jei4l+ODd/k+/VdYeE/vUl544rZlaf8uxAQb6dlARuaarxazcKhC7Ftz4VYU5LQ3yY8sd8gs7rUghk=,iv:+elkVXiYEKZ8HTY/7+HRH5HsHF29y1klUuJjMUyefCU=,tag:fhrPoS/zL2eIud0Rr9vqnw==,type:str]
+    lastmodified: "2026-11-03T02:49:43Z"
+    mac: ENC[AES256_GCM,data:HfbZ9P9w4kxliU90PZS38ktFoFpSOmTjhkR+fDGGEZdOgOAXDgJ4Fl+idulc6XtOB1MoV0rA1FJKOqyd0nba4C2fbKuX+USb/J8gEWoySxlmxxPOvBrYtBwJOnwOofed+wjYpOlfi2/h/Jh3NUUcBqVc5oAt36g7QOfIEkwnZsU=,iv:v0xr+BAexwV9egNAo+8hdfE+5/zt6BCk2U9s63B9+sk=,tag:ex+C04W5lr72Km9CUDYa5Q==,type:str]
     version: 3.13.3
