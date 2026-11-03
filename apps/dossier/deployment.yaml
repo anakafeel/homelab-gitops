@@ -1,0 +1,96 @@
+# Dossier job-search app (github.com/AienTech/dossier), arm64 build from
+# .github/workflows/images.yaml. Tailnet only (ingress.yaml).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dossier
+  labels:
+    app.kubernetes.io/name: dossier
+spec:
+  replicas: 1 # upstream: one instance per database
+  strategy:
+    type: Recreate # never two pods running migrations against the same DB
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dossier
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: dossier
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000 # "node" user baked into the image
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: dossier
+          image: ghcr.io/anakafeel/dossier:1.9.2-822912a@sha256:9b540576320b3480416fcc8c7817b8353621cce6001851e6dcba1b6d71f243ce
+          ports:
+            - name: http
+              containerPort: 3000
+          envFrom:
+            - secretRef:
+                name: dossier-env # DOSSIER_SECRET, DOSSIER_PASSWORD
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: dossier-db-app # created by CNPG
+                  key: uri
+            - name: TZ
+              value: America/Toronto # nightly backup runs at 03:00 local
+            - name: HOME
+              value: /tmp # Chromium/fontconfig caches; the image's home is read-only
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true # writes go to /data, /tmp and the Next.js cache
+            capabilities:
+              drop: ["ALL"]
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 5
+            failureThreshold: 60 # migrations + seed on first start are slow on the Pi
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 30
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 256Mi
+            limits:
+              memory: 1Gi # upstream's mem_limit: headroom for Chromium printing PDFs
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: tmp
+              mountPath: /tmp
+            - name: next-cache
+              mountPath: /app/.next/cache
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 256Mi
+        - name: next-cache
+          emptyDir:
+            sizeLimit: 256Mi
+        # Backups and export zips. Pre-created on the Pi, owned by uid 1000.
+        - name: data
+          hostPath:
+            path: /mnt/cnpg-data/dossier-files
+            type: Directory
+      nodeSelector:
+        kubernetes.io/hostname: anakafeel-pi # hostPath lives on the Pi
