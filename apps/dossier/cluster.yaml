@@ -1,0 +1,29 @@
+# Dossier's database. Sized for the Pi like umami-db.
+# No CNPG backups: Dossier writes its own nightly backup to /data
+# (deployment.yaml), which lives on the HDD loop image.
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: dossier-db
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.6-system-trixie
+  postgresql:
+    parameters:
+      shared_buffers: 32MB
+      max_connections: "30"
+  bootstrap:
+    initdb:
+      database: dossier
+      owner: dossier
+  storage:
+    storageClass: cnpg-local
+    size: 2Gi
+  resources:
+    requests:
+      cpu: 50m
+      memory: 96Mi
+    limits:
+      memory: 256Mi
+  monitoring:
+    enablePodMonitor: true

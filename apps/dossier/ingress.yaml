@@ -1,0 +1,15 @@
+# Tailnet only: https://dossier.<tailnet>.ts.net. Dossier has one password and no accounts.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dossier
+spec:
+  ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: dossier
+      port:
+        number: 80
+  tls:
+    - hosts:
+        - dossier

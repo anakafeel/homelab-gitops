@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: dossier-env
+type: Opaque
+stringData:
+    DOSSIER_SECRET: ENC[AES256_GCM,data:NPtN2KQRzBsAoP8NbsLDEYYZOqN8tOJi9bLUwsUCHWoI5kBeeBTI4ASkhUI=,iv:i+ubRqCwy9vb1B4ZHOqx+wV8ww4b9GGXZfACREjDZe8=,tag:/SzYZj0EEK2tNBUE1D58XA==,type:str]
+    DOSSIER_PASSWORD: ENC[AES256_GCM,data:3XMrN+O0XvNth1640j4lo6bY9JTPrTnI68rOmnbTfQ5rcZfJ8v/X7+GDl405KPCh46Z+GL6dx+yVNNOU1Egba+O743Jon+VbzMlklFMK34OTr/h0FEm8coH1yg==,iv:ztkUpUkPsoTmUvIsUGu9HFb8KOCWRmOg3ATAdPzhK/w=,tag:m3Yb5IuB4KkvqQHCxpdVxA==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBGMERqZVZuWXczSVJMOW1G
+            U3hVRVFIa09oZnZrdDFPOU9WVU93WHdlWERvCklXNkhNTXdhWCtKbDFKNks2ZU9p
+            alhDS3JIcGk2Ym8zcnJNYkFzN2ZlbzgKLS0tIFZSM25DYklCaWliZWtQWnp2N0g3
+            dE1tVDN1N3piKzc3ZDBkcUNkWVRqdDgK2teEVlx5jEwckmLngaXVPPRM0BK3x3am
+            ojTq3XpqrgXx6ram9U7F6kkNKuJrIm3uGvbgGqFPAwzWf2rN/EkYlQ==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1xefqhzrwz3z9pdekd648szd94q9fl3nc025cyxlgnf6gdq5zyces6jc4zm
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-03T02:18:24Z"
+    mac: ENC[AES256_GCM,data:zGPptV4Ed/ctarnP0d4SLgIX+OU+oN2aw83clSyXGal6hpYzgt0YAliaFCFKpLADjmO2Avb3j+lvw2WK7Cq3ASFcfpei9jei4l+ODd/k+/VdYeE/vUl544rZlaf8uxAQb6dlARuaarxazcKhC7Ftz4VYU5LQ3yY8sd8gs7rUghk=,iv:+elkVXiYEKZ8HTY/7+HRH5HsHF29y1klUuJjMUyefCU=,tag:fhrPoS/zL2eIud0Rr9vqnw==,type:str]
+    version: 3.13.3

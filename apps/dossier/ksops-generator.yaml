@@ -1,0 +1,12 @@
+# Decrypts dossier-env.sops.yaml: DOSSIER_SECRET (app secret, from
+# openssl rand) and DOSSIER_PASSWORD (argon2id hash from hash-password).
+apiVersion: viaduct.ai/v1
+kind: ksops
+metadata:
+  name: dossier-secrets
+  annotations:
+    config.kubernetes.io/function: |
+      exec:
+        path: ksops
+files:
+  - ./dossier-env.sops.yaml
