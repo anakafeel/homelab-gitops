@@ -34,7 +34,7 @@ spec:
               containerPort: 3000
           envFrom:
             - secretRef:
-                name: dossier-env # DOSSIER_SECRET, DOSSIER_PASSWORD
+                name: dossier-env # DOSSIER_SECRET, DOSSIER_PASSWORD, DOSSIER_AI_KEY (Gemini API, free tier)
           env:
             - name: DATABASE_URL
               valueFrom:
@@ -43,6 +43,21 @@ spec:
                   key: uri
             - name: TZ
               value: America/Toronto # nightly backup runs at 03:00 local
+            # Defaults for Settings; a choice saved in the app wins.
+            # Gemini through its OpenAI-compatible API (Dossier has no Gemini option).
+            # 3.8-flash returned 503 "high demand" on 2026-11-03; lite answered.
+            - name: DOSSIER_AI_PROVIDER
+              value: openai
+            - name: DOSSIER_AI_URL
+              value: https://generativelanguage.googleapis.com/v1beta/openai
+            - name: DOSSIER_AI_MODEL
+              value: gemini-flash-lite-latest
+            - name: DOSSIER_JOBS_SOURCE
+              value: freehire # no key; the job agent can search it
+            - name: DOSSIER_TELEMETRY
+              value: "off"
+            - name: DOSSIER_PUBLIC_URL
+              value: https://dossier.tail15e8c8.ts.net # MCP connector addresses
             - name: HOME
               value: /tmp # Chromium/fontconfig caches; the image's home is read-only
           securityContext:
