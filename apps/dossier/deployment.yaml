@@ -28,7 +28,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: dossier
-          image: ghcr.io/anakafeel/dossier:1.9.2-822912a@sha256:9b540576320b3480416fcc8c7817b8353621cce6001851e6dcba1b6d71f243ce
+          image: ghcr.io/anakafeel/dossier:1.11.0-e0688dc@sha256:e83c669d766d6e3527c0a411b1c37fb0b85c2e27430c3d318d250348de7819bd
           ports:
             - name: http
               containerPort: 3000
@@ -52,6 +52,8 @@ spec:
               value: https://generativelanguage.googleapis.com/v1beta/openai
             - name: DOSSIER_AI_MODEL
               value: gemini-flash-lite-latest
+            - name: DOSSIER_JOBS_SOURCE
+              value: freehire # no key; the job agent can search it (1.10.0+)
             - name: DOSSIER_TELEMETRY
               value: "off"
             - name: DOSSIER_PUBLIC_URL
