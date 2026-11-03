@@ -43,10 +43,11 @@ spec:
                   key: uri
             - name: TZ
               value: America/Toronto # nightly backup runs at 03:00 local
+            - name: HOME
+              value: /tmp # Chromium/fontconfig caches; the image's home is read-only
           securityContext:
             allowPrivilegeEscalation: false
-            # shortcut: not tested with a read-only root yet; try true (plus /tmp emptyDir) once it runs.
-            readOnlyRootFilesystem: false
+            readOnlyRootFilesystem: true # writes go to /data, /tmp and the Next.js cache
             capabilities:
               drop: ["ALL"]
           startupProbe:
@@ -75,7 +76,17 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
+            - name: tmp
+              mountPath: /tmp
+            - name: next-cache
+              mountPath: /app/.next/cache
       volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 256Mi
+        - name: next-cache
+          emptyDir:
+            sizeLimit: 256Mi
         # Backups and export zips. Pre-created on the Pi, owned by uid 1000.
         - name: data
           hostPath:
