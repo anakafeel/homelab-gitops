@@ -1,4 +1,4 @@
-# Builds the custom images this repo deploys (today: n8n) on a native arm64
+# Builds the custom images this repo deploys (n8n, Dossier) on a native arm64
 # runner and pushes them to GHCR with the built-in token (no stored secret).
 # Deploys pin the digest printed by the run in apps/<name>/; nothing here
 # changes the cluster by itself.
@@ -35,6 +35,44 @@ jobs:
       # Report only: n8n is pinned to 1.106.3 (newer releases crash on the Pi),
       # so its known CVEs can't be fixed by upgrading. It's reachable only on
       # the tailnet. trivy is a checksummed binary (trivy-action was hijacked).
+      - name: Vulnerability report (trivy)
+        run: |
+          curl -sSLo /tmp/trivy.tgz "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-ARM64.tar.gz"
+          echo "${TRIVY_SHA256}  /tmp/trivy.tgz" | sha256sum -c -
+          tar xzf /tmp/trivy.tgz -C /tmp trivy
+          /tmp/trivy image --quiet --ignore-unfixed --severity HIGH,CRITICAL --exit-code 0 "$IMAGE:$TAG-${GITHUB_SHA::7}"
+
+      - name: Push to GHCR
+        if: github.event_name != 'pull_request'
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker push "$IMAGE:$TAG-${GITHUB_SHA::7}"
+          digest=$(docker inspect --format '{{index .RepoDigests 0}}' "$IMAGE:$TAG-${GITHUB_SHA::7}")
+          echo "### Pushed \`$digest\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "pin: $digest"
+
+  # Dossier (job-search app) publishes amd64 images only, so build upstream's
+  # own Dockerfile for arm64 at a pinned release. Bump TAG and REF together.
+  dossier:
+    runs-on: ubuntu-26.04-arm
+    env:
+      IMAGE: ghcr.io/anakafeel/dossier
+      TAG: "1.9.2"
+      REF: 5446f4cb117b0e4b4bbf26c6156c97406b0a4ff2 # AienTech/dossier v1.9.2
+    steps:
+      - name: Fetch upstream source
+        run: |
+          git init -q src
+          git -C src fetch -q --depth 1 https://github.com/AienTech/dossier "$REF"
+          git -C src checkout -q FETCH_HEAD
+
+      - name: Build (linux/arm64)
+        run: |
+          docker build --platform linux/arm64 --target production \
+            --label org.opencontainers.image.source="https://github.com/${{ github.repository }}" \
+            -t "$IMAGE:$TAG-${GITHUB_SHA::7}" src
+
+      # Report only, like n8n: fixes come from upstream releases.
       - name: Vulnerability report (trivy)
         run: |
           curl -sSLo /tmp/trivy.tgz "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-ARM64.tar.gz"
