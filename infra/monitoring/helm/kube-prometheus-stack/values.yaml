@@ -128,6 +128,12 @@ prometheusOperator:
   prometheusConfigReloader:
     image:
       tag: v0.94.2
+  # cert-manager issues the webhook cert, so the chart drops its certgen hook
+  # Jobs. Since chart 93 Argo CD lost the race with those Jobs (they finish
+  # and delete themselves before it sees them) and every sync failed.
+  admissionWebhooks:
+    certManager:
+      enabled: true
   resources:
     requests:
       cpu: 20m
