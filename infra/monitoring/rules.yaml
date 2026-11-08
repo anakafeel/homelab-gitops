@@ -28,10 +28,10 @@ spec:
     - name: disks
       rules:
         # / = SD card, /mnt/docker-root = USB disk (k3s + Docker data),
-        # /mnt/vaultpi-hdd = photo HDD, /mnt/immich-postgres = Immich DB image.
+        # /mnt/vaultpi-hdd = photo HDD.
         - alert: DiskSpaceHigh
           expr: |
-            100 * (1 - node_filesystem_avail_bytes{mountpoint=~"/|/mnt/docker-root|/mnt/vaultpi-hdd|/mnt/immich-postgres"}
+            100 * (1 - node_filesystem_avail_bytes{mountpoint=~"/|/mnt/docker-root|/mnt/vaultpi-hdd"}
                      / node_filesystem_size_bytes) > 85
           for: 15m
           labels:
@@ -41,7 +41,7 @@ spec:
             description: "Above 85% on {{ $labels.device }}."
         - alert: DiskSpaceCritical
           expr: |
-            100 * (1 - node_filesystem_avail_bytes{mountpoint=~"/|/mnt/docker-root|/mnt/vaultpi-hdd|/mnt/immich-postgres"}
+            100 * (1 - node_filesystem_avail_bytes{mountpoint=~"/|/mnt/docker-root|/mnt/vaultpi-hdd"}
                      / node_filesystem_size_bytes) > 95
           for: 5m
           labels:
