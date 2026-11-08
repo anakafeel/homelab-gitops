@@ -120,6 +120,14 @@ alertmanager:
         memory: 128Mi
 
 prometheusOperator:
+  # shortcut: v0.95.1 (chart 93.0.0's default) was published amd64-only on
+  # quay.io and ghcr.io, so it can't run on the Pi. Drop both pins once a
+  # v0.95.x tag lists linux/arm64.
+  image:
+    tag: v0.94.2
+  prometheusConfigReloader:
+    image:
+      tag: v0.94.2
   resources:
     requests:
       cpu: 20m
